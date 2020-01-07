@@ -25,10 +25,10 @@ export DATA_DIR=/db
 
 case $1 in
   "daily")
-    ./worker.rb daily
+    exec ./worker.rb daily
     ;;
   "hourly")
-    ./worker.rb hourly
+    exec ./worker.rb hourly
     ;;
   "switch")
     shift

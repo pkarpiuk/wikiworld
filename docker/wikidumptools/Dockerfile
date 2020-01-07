@@ -7,7 +7,7 @@ ENV LANGUAGE pl_PL:pl
 ENV LANG pl_PL.UTF-8
 RUN /root/install2.sh
 USER ubuntu
-COPY --chown=ubuntu install3.sh code README.txt wiki-extra-download.rb start.sh create-data-dir-hierarchy.sh worker.rb /home/ubuntu/
+COPY --chown=ubuntu install3.sh code wiki-extra-download.rb start.sh create-data-dir-hierarchy.sh worker.rb /home/ubuntu/
 ENV GOPATH /home/ubuntu
 WORKDIR /home/ubuntu
 RUN /home/ubuntu/install3.sh
