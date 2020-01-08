@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- saved from url= -->
 <html lang="pl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Rust</title>
+    <title>Wikidumptools</title>
     
     <link href="bootstrap.min.css" rel="stylesheet">
     <script src="jquery.js"></script>
@@ -17,10 +17,232 @@
       <div class="col-xs-12">
         <div class="jumbotron">
           <h1>Wikidumptools</h1>
-          <p>Narzędzie do ściągania i przetwarzania dumpów Wikipedii</p>
+          <p>Narzędzie do ściągania i przetwarzania dumpów projektów Wikimedia</p>
         </div>
+        <h2>Katalog dumpa</h2>
+        <h3>Pliki pierwotne</h3>
+        <p>Artykuły (namespace 0), przekierowania (też namespace 0) i kategorie (namespace 14) mają wspólną przestrzeń identyfikatorów, tzn. np. nie może być artykułu o tym samym identyfikatorze co kategoria.
+          Tytuły (artykułów, przekierowań, kategorii) zwykle są z dużej litery, spacje zamienione na znak podkreślenia (o ile nie wskazano inaczej). Wartości NULL są reprezentowane przez łańcuch pusty.</p>
+        <dl class="dl-commands">
+          <dt>abstracts.tsv.gz</dt><dd>
+            <p>Jednozdaniowe skróty artykułów. Często niestety śmieci zawierające znaki takie jak '|={}[]'.</p>
+            <p>Pochodzenie: plik <code>*-abstract.xml.gz</code></p>
+            <ol>
+              <li><code>page_id</code>: identyfikator artykułu
+              <li><code>abstract</code>: pierwsze zdanie artykułu
+            </ol>
+            <p>Przykład:</p>
+            <pre>40      Aminy – organiczne związki chemiczne zawierające w swojej budowie grupę aminową, będącą organiczną pochodną amoniaku.</pre>
+          </dd>
+          <dt>article2category.tsv.gz</dt><dd>
+            <p>Kategorie artykułów. Jeden artykuł może należeć do wielu kategorii.</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Categorylinks_table">categorylinks</a></p>
+            <p>Pola:</p>
+            <ol>
+              <li><code>cl_from</code>: identyfikator artykułu
+              <li><code>cl_to</code>: identyfikator kategorii
+            </ol>
+            <p>Przykład:</p>
+            <pre>23992   330200</pre>
+          </dd>
+          <dt>articles.tsv.gz</dt><dd>
+            <p>Lista wszystkich artykułów hasłowych</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_table">page</a></p>
+            <p>Ważniejsze pola:</p>
+            <ol>
+              <li><code>page_id</code>: Identyfikator artykułu
+              <li><code>page_title</code>: Tytuł artykułu
+              <li><code>page_len</code>: Długość artykułu (w bajtach)
+            </ol>
+            <p>Przykład:</p>
+            <pre>23992	Polska_Rzeczpospolita_Ludowa	351801</pre>
+          </dd>
+          <dt>category2category.tsv.gz</dt><dd>
+            <p>Rodzice kategorii. Jedna kategoria może mieć wielu rodziców.</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Categorylinks_table">categorylinks</a>
+            <p>Pola:</p>
+            <ol>
+              <li><code>cl_from</code>: identyfikator kategorii (dziecka)
+              <li><code>cl_to</code>: identyfikator kategorii (ojca)
+            </ol>
+            <p>Przykład:</p>
+            <pre>330200  2806702</pre>
+          </dd>
+          <dt>category_index.tsv.gz</dt><dd>
+            <p>Lista wszystkich kategorii</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_table">page</a></p>
+            <p>Pola:</p>
+            <ol>
+              <li><code>page_id</code>: identyfikator kategorii
+              <li><code>page_title</code>: tytuł kategorii
+            </ol>
+            <p>Przykład:</p>
+            <pre>64034   Państwa_w_Ameryce_Północnej</pre>
+          </dd>
+          <dt>externallinks.tsv.gz</dt><dd>
+            <p>Linki prowadzące z artykułów poza Wikipedię</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Externallinks_table">externallinks</a></p>
+            <ol>
+              <li><code>el_from</code>: identyfikator artykułu w którym występuje link
+              <li><code>el_to</code>: URL linku
+            </ol>
+            <p>Przykład:</p>
+            <pre>170265  http://www.aiesec.pl</pre>
+          </dd>
+          <dt>geo_tags.tsv.gz</dt><dd>
+            <p>Lista geotagowanych artykułów</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Extension:GeoData">geo_tags</a></p>
+            <p>Pola:</p>
+            <ol>
+              <li><code>gt_page_id</code>: identyfikator artykułu
+              <li><code>gt_lat</code>: szerokość geograficzna
+              <li><code>gt_lon</code>: długość geograficzna
+              <li><code>gt_globe</code>: planeta, np. 'earth' to Ziemia
+              <li><code>gt_primary</code>: '0' gdy artykuł luźno związany z miejscem, np. "mieszkała tu kiedyś Greta Garbo", wpp '1'
+              <li><code>gt_dim</code>: szacowana wielkość obiektu (w metrach)
+              <li><code>gt_type</code>: typ obiektu (często bez sensu i w przypadku plwiki w 85% puste)
+              <li><code>gt_name</code>: nazwa obiektu (w plwiki w 99,3% pole puste)
+              <li><code>gt_country</code>: kod kraju (w plwiki w 99,54% pole puste)
+              <li><code>gt_region</code>: kod regionu (w plwiki w 99% pole puste)
+            </ol>
+            <p>Przykład:</p>
+            <pre>77364   49.21472200     20.01333300     earth   1       1000                    PL</pre>
+          </dd>
+          <dt>imagelinks.tsv.gz</dt><dd>
+            <p>Obrazki umieszczone w artykułach. W jednym artykule może być wiele obrazków</p>
+            <p>Pochodzenie: <a href="https://www.mediawiki.org/wiki/Manual:Imagelinks_table">imagelinks</a></p>
+            <ol>
+              <li><code>il_from</code>: identyfikator artykułu na którym jest obrazek
+              <li><code>il_to</code>: tytuł pliku obrazka
+            </ol>
+            <p>Przykład:</p>
+            <pre>113902  010_Centrum,_Piekary_Slaskie,_Poland.jpg</pre>
+          </dd>
+          <dt>langlinks_articles.tsv.gz</dt><dd>
+            <p>Odpowiedniki artykułu w innych wersjach językowych Wikipedii.</p>
+            <p style="font-size: 80%;"><i>Since Wikidata, 'langlinks' table no longer keeps accurate track of the actual interlanguage links in Wikipedia and other Wikimedia wikis!</i></p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Langlinks_table"></a></p>
+            <ol>
+              <li><code>ll_from</code>: identyfikator artykułu
+              <li><code>ll_lang</code>: kod językowy wikipedii (np. <code>pl</code> polska, <code>en</code> angielska, <code>de</code> niemiecka)
+              <li><code>ll_title</code>: tytuł docelowego artykułu (spacje NIE są zamienione na znaki podkreślenia)
+            </ol>
+            <p>Przykład:</p>
+            <pre>309170  en      Poland at the 1928 Winter Olympics</pre>
+          </dd>
+          <dt>langlinks_categories.tsv.gz</dt><dd>
+            <p>Odpowiedniki kategorii w innych wersjach językowych Wikipedii.</p>
+            <p style="font-size: 80%"><i>Since Wikidata, 'langlinks' table no longer keeps accurate track of the actual interlanguage links in Wikipedia and other Wikimedia wikis!</i></p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Langlinks_table">langlinks</a></p>
+            <ol>
+              <li><code>ll_from</code>: identyfikator kategorii
+              <li><code>ll_lang</code>: kod językowy wikipedii
+              <li><code>ll_title</code>: tytuł docelowego artykułu (Uwaga: spacje nie są zamienione na znaki podkreślenia, tytuł zawiera prefiks, np. 'Kategoria:' dla ll_lang='pl')
+            </ol>
+            <p>Przykład:</p>
+            <pre>1631643 de      Kategorie:Altkatholischer Bischof</pre>
+          </dd>
+          <dt>langlinks_redirects.tsv.gz</dt><dd>
+            <p>Odpowiedniki przekierowania w innych wersjach językowych Wikipedii.</p>
+            <p style="font-size: 80%"><i>Since Wikidata, 'langlinks' table no longer keeps accurate track of the actual interlanguage links in Wikipedia and other Wikimedia wikis!</i></p>
+            <p>Pochodzenie: <a href="https://www.mediawiki.org/wiki/Manual:Langlinks_table">langlinks</a></p>
+            <ol>
+              <li><code>ll_from</code>: identyfikator przekierowania
+              <li><code>ll_lang</code>: kod językowy Wikipedii
+              <li><code>ll_title</code>: tytuł docelowego artykułu (Uwaga: spacje NIE są zamienione na znaki podkreślenia)
+            </ol>
+            <p>Przykład:</p>
+            <pre>12147   en      Field theory (mathematics)</pre>
+          </dd>
+          <dt>pagelinks.tsv.gz</dt><dd>
+            <p>Powiązania między artykułami. Jeśli po którejś stronie linku jest przekierowanie, to jest ono zastępowane odpowiadającym mu artykułem.</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Pagelinks_table">pagelinks</a></p>
+            <p>Pola:</p>
+            <ol>
+              <li><code>pl_from</code>: identyfikator artykułu zawierającego link do innego artykułu
+              <li><code>to_page_id</code>: identyfikator artykułu docelowego linku
+            </ol>
+            <p>Przykład:</p>
+            <pre>2549341 2546433</pre>
+          </dd>
+          <dt>page_props_articles.tsv.gz</dt><dd>
+            <p>Własności artykułów</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_props_table">page_props</a></p>
+            <ol>
+              <li><code>pp_page</code>: identyfikator artykułu
+              <li><code>pp_propname</code>: nazwa własności (najciekawsza to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData)
+              <li><code>pp_value</code>: wartość własności
+            </ol>
+            <p>Przykład:</p>
+            <pre>4685628 wikibase_item   Q3472926</pre>
+          </dd>
+          <dt>page_props_categories.tsv.gz</dt><dd>
+            <p>Własności kategorii</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_props_table">page_props</a></p>
+            <ol>
+              <li><code>pp_page</code>: identyfikator kategorii
+              <li><code>pp_propname</code>: nazwa własności (najciekawsze to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData, oraz 'hiddencat')
+              <li><code>pp_value</code>: wartość własności
+            </ol>
+            <p>Przykład:</p>
+            <pre>64021   wikibase_item   Q2945667</pre>
+          </dd>
+          <dt>page_props_redirects.tsv.gz</dt><dd>
+            <p>Własności przekierowań</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_props_table">page_props</a></p>
+            <ol>
+              <li><code>pp_page</code>: identyfikator przekierowania
+              <li><code>pp_propname</code>: nazwa własności (najciekawsze to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData, oraz 'displaytitle')
+              <li><code>pp_value</code>: wartość własności
+            </ol>
+            <p>Przykład:</p>
+            <pre>20816   wikibase_item   Q11792035</pre>
+          </dd>
+          <dt>page_restrictions.tsv.gz</dt><dd>
+            <p>Artykuły zabezpieczone przed modyfikacją</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_restrictions_table">page_restrictions</a></p>
+            <ol>
+              <li><code>pr_page</code>: identyfikator artykułu
+              <li><code>pr_type</code>: typ zabezpieczenia - "edit" lub "move"
+              <li><code>pr_level</code>: poziom zabezpieczenia - "sysop" dla pełnego zabezpieczenia, "autoconfirmed" dla pseudoprotekcji, "editor" dla pozostałych
+              <li><code>pr_cascade</code>: w praktyce zawsze '0' (czy zabezpieczone są wszystkie obiekty zawarte w artykule takie jak obrazki i szablony)
+              <li><code>pr_user</code>
+              <li><code>pr_expiry</code>
+            </ol>
+          </dd>
+          <dt>redirects.tsv.gz</dt><dd>
+            <p>Przekierowania, czyli nazwy alternatywne. Np. 'PRL' jest nazwą alternatywną dla artykułu 'Polska Rzeczpospolita Ludowa'.</p>
+            <p style="font-size: 80%;"><i>As of August 2007, database dumps for Wikipedia and other Wikimedia projects as provided on https://dumps.wikimedia.org/ have incomplete data in this table: only redirect pages that have been created or edited after summer 2007 are present. For older redirects, resort to using the pagelinks table.</i></p>
+            <p>Pochodzenie: <a href="https://www.mediawiki.org/wiki/Manual:Page_table">page</a>, <a href="https://www.mediawiki.org/wiki/Manual:Redirect_table">redirect</a></p>
+            <ol>
+              <li><code>redir_id</code>: identyfikator przekierowania
+              <li><code>article_id</code>: identyfikator artykułu, do którego prowadzi przekierowanie
+              <li><code>redir_title</code>: tytuł przekierowania (np. 'PRL')
+            </ol>
+            <p>Przykład:</p>
+            <pre>4767    23992   PRL</pre>
+          </dd>
+          <dt>templatelinks.tsv.gz</dt><dd>
+            <p>Uwzględniane są tylko powiązania artykułów namespace 0 z template'ami</p>
+            <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Templatelinks_table">templatelinks</a></p>
+            <ol>
+              <li><code>tl_from</code>: identyfikator artykułu zawierającego szablon
+              <li><code>tl_namespace</code>: przestrzeń nazw szablonu (10 oznacza Template, 828 to Module (Lua))
+              <li><code>tl_title</code>: tytuł szablonu
+            </ol>
+            <p>Przykład:</p>
+            <pre>3796860	10	Wieś_infobox</pre>
+          </dd>
+        </dl>
+        <h3>Pliki wtórne</h3>
+        <dl class="dl-commands">
+          <dt>categories.json.gz</dt><dd></dd>
+          <dt>clickstream-articles.json.gz</dt><dd></dd>
+          <dt>months_pageview_articles.tsv.gz</dt><dd></dd>
 
+        </dl>
       </div>
     </div>
   </body>
 </html>
+
