@@ -19,7 +19,99 @@
           <h1>Wikidumptools</h1>
           <p>Narzędzie do ściągania i przetwarzania dumpów projektów Wikimedia</p>
         </div>
+        <h2>Uruchamianie</h2>
+        <pre>$ export DATA_DIR=/mnt/arch/wiki-data
+$ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
+$ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools hourly</pre>
+        <h2>Zmienne środowiskowe</h2>
+        <p>Musi być zdefiniowana i niepusta przynajmniej jedna z dwóch zmiennych: <code>WIKIPEDIA_LANGUAGES</code> lub <code>WIKIQUOTE_LANGUAGES</code>.</p>
+        <dl class="dl-commands">
+          <dt>WIKIPEDIA_LANGUAGES</dt><dd>Lista rozdzielonych spacją wersji językowych Wikipedii, które mają być ściągane, np. 'pl en de'.</dd>
+          <dt>WIKIQUOTE_LANGUAGES</dt><dd>Lista rozdzielonych spacją wersji językowych Wikicytatów, które mają być ściągane, np. 'pl en de'</dd>
+          <dt>PAGEVIEW_MONTHS</dt><dd>Ile ostatnich plików miesięcznych pageview ściągnąć. Domyślnie 26, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
+          <dt>PAGEVIEW_DAYS</dt><dd>Ile ostatnich plików dziennych pageview ściągnąć. Domyślnie 64, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
+          <dt>CLICKSTREAM_MONTHS</dt><dd>Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
+        </dl>
+        <h2>Struktura katalogów</h2>
+        <pre>$DATA_DIR/
+  cache/                   # da się łatwo odtworzyć
+    clickstream/
+      2019-11/             # tu pliki https://dumps.wikimedia.org/other/clickstream/2019-11/clickstream-plwiki-2019-11.tsv.gz
+      ...
+    pageview/
+      months/              # tu pliki https://dumps.wikimedia.org/other/pagecounts-ez/merged/pagecounts-YYYY-MM-views-ge-5-totals.bz2
+      days/                # tu pliki https://dumps.wikimedia.org/other/pagecounts-ez/merged/YYYY/YYYY-MM/pagecounts-YYYY-MM-DD.bz2
+      hours/               # tu pliki https://dumps.wikimedia.org/other/pageviews/YYYY/YYYY-MM/pageviews-YYYYMMDD-HH0000.gz, 
+                           #   okrojone do wikipedii: en,de,fr,ru,it,es,pl,pt
+    dumps/
+      wikipedia/
+        pl/                        # dumpy z https://dumps.wikimedia.org/plwiki/
+          current/  -> 20191222/
+          previous/ -> 20191001/
+          20191222/
+            extract-logs.txt       # jeśli w ostatnim wierszu pliku jest 'OK' to znaczy że faza 'extract' zakończyła się poprawnie
+            cathier-logs.txt
+            ...                    # pliki danych *.tsv.gz i *.json.gz
+          20191120/
+            ...
+          20191001/
+            ...
+          ...
+        en/                        # dumpy z https://dumps.wikimedia.org/enwiki/
+          ...
+      wikiquote/
+        pl/                        # dumpy z https://dumps.wikimedia.org/plwikiquote/
+        ...
+  logs/                    # tutaj logi narzędzia wikidumptools (z wyjątkiem tych w dumpach)
+    clickstream-logs.txt
+    hours-pageview-logs.txt
+    pageview-days-logs.txt
+    pageview-months-logs.txt
+  public/                  # dane statyczne do wystawienia w serwerze HTTP
+    downloader-stats.txt   # podsumowanie działania ostatniego cyklu wywołania 'wikidumptools daily'
+    wikipedia/
+      pl/
+        current/ -> 20191220
+        20191220/
+          hour-pageview.json
+          geo-by-*.png
+    wikiquote/
+  db/                      # trudno się odtwarza
+    wikipedia/
+      createts/
+</pre>
+        <h2>Clickstream</h2>
+        <p>Pliki clickstream udostępniane w <a href="https://dumps.wikimedia.org/other/clickstream">https://dumps.wikimedia.org/other/clickstream</a> i opisane w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream</a>. Są one generowane od 2017-11 co miesiąc tylko dla niektórych wersji językowych Wikipedii (de, en, es, fa, fr, it, ja, pl, pt, ru, zh), liczba języków zmienia się w czasie (początkowo było tylko de, en, es, ja, ru).</p>
+        <p>Pliki clickstream <code>clickstream-<i>lang</i>wiki-<i>YYYY-MM</i>.tsv.gz</code> (domyślnie wszystkie) są zrzucane do <code><i>DATA_DIR</i>/cache/clickstream/<i>YYYY-MM</i></code>. Są one obecnie wykorzystywane do generowania plików <code><a href="#clickstream-articles">clickstream-articles.json.gz</a></code> oraz <code>hour-pageview.json</code> dla każdej wersji językowej Wikipedii.</p>
+        <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/clickstream-logs.txt</code>.</p>
+        <h2>Katalogi pageview</h2>
+        <p>Pliki pageview mają po jednym rekordzie w wierszu, wiersz ma postać (dokładny opis - <a href="https://dumps.wikimedia.org/other/pagecounts-ez/">https://dumps.wikimedia.org/other/pagecounts-ez/</a>):</p>
+        <ol>
+          <li>kod językowy projektu (np. polska wikipedia to będzie 'pl.z')
+          <li>tytuł artykułu (znaki spacji zamienione na podkreślenia)
+          <li>liczba odwiedzin w danym przedziale czasu (np. miesiąca dla pageview miesięcznych)
+        </ol>
+        <p>Plik pageview obejmuje wejścia na wszystkie projekty Wikimedia i wszystkie wersje językowe (nie tylko Wikipedie, ale też Wikiquote, Wikibooks itp.).</p>
+        <pre>pl.z Rzeczpospolita_Polska 4596</pre>
+        <h3>Miesięczne</h3>
+        <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/months</code> przechowywane są pliki <code>pagecounts-<i>YYYY-MM</i>-views-ge-5-totals.bz2</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pagecounts-ez/merged/">https://dumps.wikimedia.org/other/pagecounts-ez/merged/</a></code>.</p>
+        <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej każdego projektu Wikimedia z granulacją miesięczną. Domyślnie system utrzymuje ostatnich 26 plików (miesięcy), potrzebnych jest minimum 12 - patrz zmienna środowiskowa <code>PAGEVIEW_MONTHS</code>. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
+        <p>Pliki pageview miesięczne są wykorzystywane do generowania pliku <code><a href="#months-pageview-articles">months_pageview_articles.tsv.gz</a></code> dla każdej wersji językowej Wikipedii.</p>
+        <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/pageview-months-logs.txt</code>.</p>
+        <h3>Dobowe</h3>
+        <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/days</code> przechowywane są pliki <code>pagecounts-<i>YYYY-MM-DD</i>.bz2</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pagecounts-ez/merged">https://dumps.wikimedia.org/other/pagecounts-ez/merged/<i>YYYY</i>/<i>YYYY-MM</i></a></code>.</p>
+        <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej każdego projektu Wikimedia z granulacją dobową. Domyślnie system utrzymuje ostatnich 64 plików (dni), potrzebnych jest minimum 31 - patrz zmienna środowiskowa <code>PAGEVIEW_MONTHS</code>. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
+        <p>Pliki pageview dobowe obecnie nie są wykorzystywane do generowania żadnych plików pochodnych.</p>
+        <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/pageview-days-logs.txt</code>.</p>
+        <h3>Godzinowe</h3>
+        <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/hours</code> przechowywane są pliki <code>pageviews-<i>YYYYMMDD-HH</i>0000.gz</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pageviews">https://dumps.wikimedia.org/other/pageviews/<i>YYYY</i>/<i>YYYY-MM</i></a></code>.</p>
+        <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej <b>tylko wybranych wersji językowych Wikipedii (en, de, fr, ru, it, es, pl, pt)</b>, z granulacją godzinną. Domyślnie system utrzymuje ostatnich 24 plików (godzin), potrzebnych jest minimum 24. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
+        <p>Pliki pageview godzinowe są wykorzystywane do generowania pliku <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code>.</p>
+        <p>
+        
         <h2>Katalog dumpa</h2>
+        <p><code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i></code>, np. <code>$DATA_DIR/cache/dumps/wikipedia/pl/20191220</code></p>
+        <p>Tutaj trafiają przetworzone pliki danej wersji językowej Wikipedii, np. dla polskiej wersji z <a href="https://dumps.wikimedia.org/plwiki/">https://dumps.wikimedia.org/plwiki/</a></p>
         <h3>Pliki pierwotne</h3>
         <p>Artykuły (namespace 0), przekierowania (też namespace 0) i kategorie (namespace 14) mają wspólną przestrzeń identyfikatorów, tzn. np. nie może być artykułu o tym samym identyfikatorze co kategoria.
           Tytuły (artykułów, przekierowań, kategorii) zwykle są z dużej litery, spacje zamienione na znak podkreślenia (o ile nie wskazano inaczej). Wartości NULL są reprezentowane przez łańcuch pusty.</p>
@@ -265,7 +357,7 @@
             <pre>{"id":3239599,"title":"Nieistniejące_kluby_sportowe_w_Stanach_Zjednoczonych","parents":[2198034,2197915],
 "children":[1026467,3239602], "wikidata_id":"Q8371215","articles_count":2,"subtree_articles_count":227,"subtree_cats_count":21}</pre>
           </dd>
-          <dt>clickstream-articles.json.gz</dt><dd>
+          <dt><a name="clickstream-articles"></a>clickstream-articles.json.gz</dt><dd>
             <ul>
               <li><code>_id</code>: identyfikator artykułu
               <li><code>prev</code>: skąd użytkownicy przeszli do artykułu
@@ -286,7 +378,7 @@
   "next":{"108287":78,"38195":13,"86077":10}
 }</pre>
           </dd>
-          <dt>months_pageview_articles.tsv.gz</dt><dd>
+          <dt><a name="months-pageview-articles"></a>months_pageview_articles.tsv.gz</dt><dd>
             <p>Plik zawiera informacje ile razy odwiedzono każdy artykuł Wikipedii w ciągu ostatnich 12 miesięcy.</p>
             <p>Pola:</p>
             <ol>
