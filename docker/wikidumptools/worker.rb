@@ -147,6 +147,11 @@ def daily_main()
     months_log_fpath = File.join( logs_dir, 'pageview-months-logs.txt' )
     result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download pageview-months #{$PAGEVIEW_MONTHS} >> '#{months_log_fpath}' 2>&1" )
   end
+  if $CLICKSTREAM_MONTHS >= 0 then
+    puts "Downloading monthly clickstream files"
+    clickstream_log_fpath = File.join( logs_dir, 'clickstream-logs.txt' )
+    result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download clickstream #{$CLICKSTREAM_MONTHS} >> '#{clickstream_log_fpath}' 2>&1" )
+  end
 
   puts "Downloading new dumps"
   # Zaciągamy najnowsze dumpy (extract+cathier full)
@@ -165,11 +170,6 @@ def daily_main()
     puts "Downloading daily pageviews"
     days_log_fpath = File.join( logs_dir, 'pageview-days-logs.txt' )
     result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download pageview-days #{$PAGEVIEW_DAYS} >> '#{days_log_fpath}' 2>&1" )
-  end
-  if $CLICKSTREAM_MONTHS >= 0 then
-    puts "Downloading monthly clickstream files"
-    clickstream_log_fpath = File.join( logs_dir, 'clickstream-logs.txt' )
-    result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download clickstream #{$CLICKSTREAM_MONTHS} >> '#{clickstream_log_fpath}' 2>&1" )
   end
   result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download data-dir-info > #{File.join($DATA_DIR, 'public', 'downloader-stats.txt')} 2>&1" )
 end
