@@ -80,6 +80,57 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
     wikipedia/
       createts/
 </pre>
+        <h2>Public</h2>
+        <h3>downloader-stats.txt</h3>
+        <p>Plik <code>public/downloader-stats.txt</code> zawiera podsumowanie zawartości drzewa katalogów z danymi (zakorzenionego w <i>DATA_DIR</i>). Generowany jest na zakończenie każdego cyklu procesu 'wikidumptools daily'.</p>
+        <p>Przykładowa zawartość:</p>
+        <pre>TODO</pre>
+        <h3>hour-pageview.json</h3>
+        <p>Nazwa pola ujęta w nawiasy kwadratowe oznacza że pole jest opcjonalne.</p>
+        <dl class="dl-commands">
+          <dt>ts_utc</dt><dd>na jaką godzinę aktualny jest plik (w formacie YYYY-MM-DD HH:00:00)</dd>
+          <dt>articles</dt><dd>
+            <dl class="dl-commands">
+              <dt>page_id</dt><dd>(long) identyfikator artykułu hasłowego</dd>
+              <dt>title</dt><dd>(string) tytuł artykułu (znaki spacji zamienione na podkreślenia)</dd>
+              <dt>[gps]</dt><dd>
+                <p>Dokładne znaczenie pól <code>primary</code>, <code>globe</code>, <code>dim</code>, <code>type</code>, <code>name</code> i <code>country</code> na stronie <a href="https://www.mediawiki.org/wiki/Extension:GeoData">https://www.mediawiki.org/wiki/Extension:GeoData</a>. Tylko 3 pierwsze pola są sensownie wypełniane w każdej wersji językowej Wikipedii. Polska wersja językowa ma pozostałe pola wypełnione nierzetelnie (np. <code>dim</code>) lub wcale (w 99% przypadków).</p>
+                <dl class="dl-commands">
+                  <dt>lat</dt><dd>(float) szerokość geograficzna</dd>
+                  <dt>lon</dt><dd>(float) długość geograficzna</dd>
+                  <dt>primary</dt><dd>(bool) true gdy współrzędne odnoszą się do samego artykułu; false gdy są to współrzędne jakiegoś miejsca wspomnianego w artykule (np. artykuł jest o Marii Konopnickiej a miejsce jej urodzenia ma współrzędne GPS)</dd>
+                  <dt>[globe]</dt><dd>(string) <code>earth</code> dla Ziemi</dd>
+                  <dt>[dim]</dt><dd>szacowana wielkość obiektu (w metrach)</dd>
+                  <dt>[type]</dt><dd>rodzaj obiektu</dd>
+                  <dt>[name]</dt><dd>nazwa obiektu</dd>
+                  <dt>[country]</dt><dd>kod państwa w którym obiekt występuje</dd>
+                </dl>
+              </dd>
+              <dt>length</dt><dd>(int) długość artykułu (w bajtach)</dd>
+              <dt>[langlinks]</dt><dd>mapa z kodu wersji językowej Wikipedii (string) w tytuł artykułu w tej wersji językowej (string, znaki spacji NIE są zamieniane na podkreślenia).</dd>
+              <dt>[image_file]</dt><dd>(string) nazwa pliku głównego obrazka artykułu</dd>
+              <dt>[cats]</dt><dd>lista identyfikatorów kategorii</dd>
+              <dt>[pagelinks]</dt><dd>(list of string) lista identyfikatorów artykułów do których można przejść z bieżącego artykułu po linkach</dd>
+              <dt>[templates]</dt><dd>lista nazw szablonów użytych w artykule (spacje zamienione na znaki podkreślenia)</dd>
+              <dt>[prev]</dt><dd></dd>
+              <dt>[next]</dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+              <dt></dt><dd></dd>
+            </dl>
+          </dd>
+        </dl>
+        <p>Przykład:</p>
+        <pre></pre>
+        <h3>geo-by-*.png</h3>
+        
         <h2>Clickstream</h2>
         <p>Pliki clickstream udostępniane w <a href="https://dumps.wikimedia.org/other/clickstream">https://dumps.wikimedia.org/other/clickstream</a> i opisane w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream</a>. Są one generowane od 2017-11 co miesiąc tylko dla niektórych wersji językowych Wikipedii (de, en, es, fa, fr, it, ja, pl, pt, ru, zh), liczba języków zmienia się w czasie (początkowo było tylko de, en, es, ja, ru).</p>
         <p>Pliki clickstream <code>clickstream-<i>lang</i>wiki-<i>YYYY-MM</i>.tsv.gz</code> (domyślnie wszystkie) są zrzucane do <code><i>DATA_DIR</i>/cache/clickstream/<i>YYYY-MM</i></code>. Są one obecnie wykorzystywane do generowania plików <code><a href="#clickstream-articles">clickstream-articles.json.gz</a></code> oraz <code>hour-pageview.json</code> dla każdej wersji językowej Wikipedii.</p>
