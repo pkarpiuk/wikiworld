@@ -17,6 +17,7 @@ import "compress/gzip"
 import "bytes"
 import utils "tiger.com.pl/wikidumptools/utils"
 import synthesis "tiger.com.pl/wikidumptools/synthesis"
+import cathier "tiger.com.pl/wikidumptools/cathier"
 
 const LastHoursCount int = 24
 const TopCount int = 1000
@@ -89,8 +90,9 @@ func process_hour_pageview_table( p map[string]string ) {
 }
 
 type Result struct {
-  Timestamp string              `json:"ts_utc"`
-  Articles []*synthesis.Article `json:"articles"`
+  Timestamp string               `json:"ts_utc"`
+  Articles []*synthesis.Article  `json:"articles"`
+  Categories []*cathier.Category `json:"categories,omitempty"`
 }
 
 func generateTop( timestamp time.Time ) {
@@ -126,12 +128,15 @@ func generateTop( timestamp time.Time ) {
   synthesis.Generate( fmt.Sprintf( "%swiki", LangCode ), nil )
   result := Result {
     Timestamp: timestamp.Format( "2006-01-02 15:04:05" ),
-    Articles: make([]*synthesis.Article,0) }
+    Articles: make([]*synthesis.Article,0),
+    Categories: synthesis.CategoryGraphToSlice() }
   for _, s_article := range synthesis.AllArticlesById {
     if s_article != nil {
       article := ArticlesByTitle[s_article.Title]
       if article != nil {
+        oldVal := s_article.Views[0]
         s_article.Views = TheAcc[s_article.Title]
+        s_article.Views = append( s_article.Views, oldVal )
         // fmt.Println( s_article.Title, s_article.Views )
       }
     }
@@ -294,7 +299,7 @@ func downloadFile( filepath string, url string ) error {
 
 func Main( args []string ) bool {
   synthesis.GenerateCategoriesFlag = true
-  synthesis.DisableFlags = map[string]bool { "page_restrictions": true, "displaytitle": true, "wikidata_id": true, "extract": true, "redirects": true, "externallinks": true, "modules": true, "imagelinks": true, "views": true, "extra": true }
+  synthesis.DisableFlags = map[string]bool { "page_restrictions": true, "displaytitle": true, "wikidata_id": true, "extract": true, "redirects": true, "externallinks": true, "modules": true, "imagelinks": true, "extra": true }
 
   if len(args) < 1 {
     return false

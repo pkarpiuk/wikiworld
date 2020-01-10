@@ -167,6 +167,17 @@ func DumpTraverse( cat *Category, enc *json.Encoder ) {
   }
 }
 
+func Accumulate( cat *Category, acc []*Category, was map[int64]bool ) []*Category {
+  acc = append(acc, cat)
+  was[cat.Id] = true
+  for _, child := range cat.children {
+    if !was[child.Id] {
+      acc = Accumulate( child, acc, was )
+    }
+  }
+  return acc
+}
+
 func dump(w io.WriteCloser) {
   enc := json.NewEncoder( w )
   for _, cat := range CatsByPageId {

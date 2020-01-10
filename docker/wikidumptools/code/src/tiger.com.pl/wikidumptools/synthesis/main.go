@@ -80,6 +80,15 @@ var AllArticlesById map[int64]*Article = make(map[int64]*Article)
 var AllRedirectsById map[string]*Article = make(map[string]*Article)
 var CategoryGraph map[int64]*cathier.Category = make(map[int64]*cathier.Category)
 
+func CategoryGraphToSlice() []*cathier.Category {
+  if GenerateCategoriesFlag {
+    result := make([]*cathier.Category,0,len(CategoryGraph))
+    return cathier.Accumulate( RootNode, result, make(map[int64]bool) )
+  } else {
+    return nil
+  }
+}
+
 func readArticleIds( r io.ReadCloser ) {
   defer r.Close()
   scanner := bufio.NewScanner(r)
