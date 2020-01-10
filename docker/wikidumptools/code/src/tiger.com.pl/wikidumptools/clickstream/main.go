@@ -160,8 +160,10 @@ func process_clickstream_table( p map[string]string ) {
   if c_curr_article != nil {
     if c_prev_article != nil {
       c_curr_article.Prev[fmt.Sprintf("%d",c_prev_article.PageId)] += count
-    } else {
+    } else if strings.HasPrefix( c_prev, "other-" ) {
       c_curr_article.Prev[c_prev] += count
+    } else {
+      fmt.Fprintf( os.Stderr, "Unknown prev: '%s'\n", c_prev )
     }
   }
   if (c_prev_article != nil) && (c_curr_article != nil) {
