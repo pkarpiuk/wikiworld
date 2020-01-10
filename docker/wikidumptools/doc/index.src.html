@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<!-- saved from url= --><html lang="pl">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- saved from url= -->
+<html lang="pl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Wikidumptools</title>
     
     <link href="bootstrap.min.css" rel="stylesheet">
@@ -14,50 +13,26 @@
     </style>
   </head>
   <body>
-<div style="position: fixed; right: 10px; top: 10px; bottom: 10px; padding: 8px; margin: 8px; font-size: 90%; background-color: lightgray; border-style: solid; border-width: 2px; border-color: black;">
-1. <a href="#1Uruchamianie">Uruchamianie</a><br>
-2. <a href="#2Zmienne%20%C5%9Brodowiskowe">Zmienne środowiskowe</a><br>
-3. <a href="#3Struktura%20katalog%C3%B3w">Struktura katalogów</a><br>
-4. <a href="#4Public">Public</a><br>
-    4.1. <a href="#4.1downloader-stats.txt">downloader-stats.txt</a><br>
-    4.2. <a href="#4.2hour-pageview.json">hour-pageview.json</a><br>
-    4.3. <a href="#4.3geo-by-*.png">geo-by-*.png</a><br>
-5. <a href="#5Clickstream">Clickstream</a><br>
-6. <a href="#6Katalogi%20pageview">Katalogi pageview</a><br>
-    6.1. <a href="#6.1Miesi%C4%99czne">Miesięczne</a><br>
-    6.2. <a href="#6.2Dobowe">Dobowe</a><br>
-    6.3. <a href="#6.3Godzinowe">Godzinowe</a><br>
-7. <a href="#7Katalog%20dumpa">Katalog dumpa</a><br>
-    7.1. <a href="#7.1Pliki%20pierwotne">Pliki pierwotne</a><br>
-    7.2. <a href="#7.2Pliki%20wt%C3%B3rne">Pliki wtórne</a><br>
-    7.3. <a href="#7.3Pliki%20log%C3%B3w">Pliki logów</a><br>
-</div>
-
     <div class="container">
       <div class="col-xs-12">
         <div class="jumbotron">
           <h1>Wikidumptools</h1>
           <p>Narzędzie do ściągania i przetwarzania dumpów projektów Wikimedia</p>
         </div>
-        <a name="1Uruchamianie"></a><h2>1. Uruchamianie</h2>
+        <h2>Uruchamianie</h2>
         <pre>$ export DATA_DIR=/mnt/arch/wiki-data
 $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
 $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools hourly</pre>
-        <a name="2Zmienne%20%C5%9Brodowiskowe"></a><h2>2. Zmienne środowiskowe</h2>
+        <h2>Zmienne środowiskowe</h2>
         <p>Musi być zdefiniowana i niepusta przynajmniej jedna z dwóch zmiennych: <code>WIKIPEDIA_LANGUAGES</code> lub <code>WIKIQUOTE_LANGUAGES</code>.</p>
         <dl class="dl-commands">
-          <dt>WIKIPEDIA_LANGUAGES</dt>
-<dd>Lista rozdzielonych spacją wersji językowych Wikipedii, które mają być ściągane, np. 'pl en de'.</dd>
-          <dt>WIKIQUOTE_LANGUAGES</dt>
-<dd>Lista rozdzielonych spacją wersji językowych Wikicytatów, które mają być ściągane, np. 'pl en de'</dd>
-          <dt>PAGEVIEW_MONTHS</dt>
-<dd>Ile ostatnich plików miesięcznych pageview ściągnąć. Domyślnie 26, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
-          <dt>PAGEVIEW_DAYS</dt>
-<dd>Ile ostatnich plików dziennych pageview ściągnąć. Domyślnie 64, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
-          <dt>CLICKSTREAM_MONTHS</dt>
-<dd>Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
+          <dt>WIKIPEDIA_LANGUAGES</dt><dd>Lista rozdzielonych spacją wersji językowych Wikipedii, które mają być ściągane, np. 'pl en de'.</dd>
+          <dt>WIKIQUOTE_LANGUAGES</dt><dd>Lista rozdzielonych spacją wersji językowych Wikicytatów, które mają być ściągane, np. 'pl en de'</dd>
+          <dt>PAGEVIEW_MONTHS</dt><dd>Ile ostatnich plików miesięcznych pageview ściągnąć. Domyślnie 26, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
+          <dt>PAGEVIEW_DAYS</dt><dd>Ile ostatnich plików dziennych pageview ściągnąć. Domyślnie 64, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
+          <dt>CLICKSTREAM_MONTHS</dt><dd>Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
         </dl>
-        <a name="3Struktura%20katalog%C3%B3w"></a><h2>3. Struktura katalogów</h2>
+        <h2>Struktura katalogów</h2>
         <pre>$DATA_DIR/
   cache/                   # da się łatwo odtworzyć
     clickstream/
@@ -71,8 +46,8 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
     dumps/
       wikipedia/
         pl/                        # dumpy z https://dumps.wikimedia.org/plwiki/
-          current/  -&gt; 20191222/
-          previous/ -&gt; 20191001/
+          current/  -> 20191222/
+          previous/ -> 20191001/
           20191222/
             extract-logs.txt       # jeśli w ostatnim wierszu pliku jest 'OK' to znaczy że faza 'extract' zakończyła się poprawnie
             cathier-logs.txt
@@ -96,7 +71,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
     downloader-stats.txt   # podsumowanie działania ostatniego cyklu wywołania 'wikidumptools daily'
     wikipedia/
       pl/
-        current/ -&gt; 20191220
+        current/ -> 20191220
         20191220/
           hour-pageview.json
           geo-by-*.png
@@ -105,115 +80,67 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
     wikipedia/
       createts/
 </pre>
-        <a name="4Public"></a><h2>4. Public</h2>
-        <a name="4.1downloader-stats.txt"></a><h3>4.1. downloader-stats.txt</h3>
+        <h2>Public</h2>
+        <h3>downloader-stats.txt</h3>
         <p>Plik <code>public/downloader-stats.txt</code> zawiera podsumowanie zawartości drzewa katalogów z danymi (zakorzenionego w <i>DATA_DIR</i>). Generowany jest na zakończenie każdego cyklu procesu 'wikidumptools daily'.</p>
         <p>Przykładowa zawartość:</p>
         <pre>TODO</pre>
-        <a name="4.2hour-pageview.json"></a><h3>4.2. hour-pageview.json</h3>
+        <h3>hour-pageview.json</h3>
         <p>Nazwa pola ujęta w nawiasy kwadratowe oznacza że pole jest opcjonalne.</p>
         <dl class="dl-commands">
-          <dt>ts_utc</dt>
-<dd>na jaką godzinę aktualny jest plik (w formacie YYYY-MM-DD HH:00:00)</dd>
-          <dt>articles</dt>
-<dd>
+          <dt>ts_utc</dt><dd>na jaką godzinę aktualny jest plik (w formacie YYYY-MM-DD HH:00:00)</dd>
+          <dt>articles</dt><dd>
             <dl class="dl-commands">
-              <dt>page_id</dt>
-<dd>(long) identyfikator artykułu hasłowego</dd>
-              <dt>title</dt>
-<dd>(string) tytuł artykułu (znaki spacji zamienione na podkreślenia)</dd>
-              <dt>views</dt>
-<dd>(list of int) lista 6 wartości liczbowych, które mówią ile było wejść do bieżącego artykułu w ciągu 1, 3, 6, 12, 24 ostatnich godzin oraz w ciągu ostatniego roku
-              </dd>
-<dt>[gps]</dt>
-<dd>
+              <dt>page_id</dt><dd>(long) identyfikator artykułu hasłowego</dd>
+              <dt>title</dt><dd>(string) tytuł artykułu (znaki spacji zamienione na podkreślenia)</dd>
+              <dt>views</dt><dd>(list of int) lista 6 wartości liczbowych, które mówią ile było wejść do bieżącego artykułu w ciągu 1, 3, 6, 12, 24 ostatnich godzin oraz w ciągu ostatniego roku
+              <dt>[gps]</dt><dd>
                 <p>Dokładne znaczenie pól <code>primary</code>, <code>globe</code>, <code>dim</code>, <code>type</code>, <code>name</code> i <code>country</code> na stronie <a href="https://www.mediawiki.org/wiki/Extension:GeoData">https://www.mediawiki.org/wiki/Extension:GeoData</a>. Tylko 3 pierwsze pola są sensownie wypełniane w każdej wersji językowej Wikipedii. Polska wersja językowa ma pozostałe pola wypełnione nierzetelnie (np. <code>dim</code>) lub wcale (w 99% przypadków).</p>
                 <dl class="dl-commands">
-                  <dt>lat</dt>
-<dd>(float) szerokość geograficzna</dd>
-                  <dt>lon</dt>
-<dd>(float) długość geograficzna</dd>
-                  <dt>primary</dt>
-<dd>(bool) true gdy współrzędne odnoszą się do samego artykułu; false gdy są to współrzędne jakiegoś miejsca wspomnianego w artykule (np. artykuł jest o Marii Konopnickiej a miejsce jej urodzenia ma współrzędne GPS)</dd>
-                  <dt>[globe]</dt>
-<dd>(string) <code>earth</code> dla Ziemi</dd>
-                  <dt>[dim]</dt>
-<dd>szacowana wielkość obiektu (w metrach)</dd>
-                  <dt>[type]</dt>
-<dd>rodzaj obiektu</dd>
-                  <dt>[name]</dt>
-<dd>nazwa obiektu</dd>
-                  <dt>[country]</dt>
-<dd>kod państwa w którym obiekt występuje</dd>
+                  <dt>lat</dt><dd>(float) szerokość geograficzna</dd>
+                  <dt>lon</dt><dd>(float) długość geograficzna</dd>
+                  <dt>primary</dt><dd>(bool) true gdy współrzędne odnoszą się do samego artykułu; false gdy są to współrzędne jakiegoś miejsca wspomnianego w artykule (np. artykuł jest o Marii Konopnickiej a miejsce jej urodzenia ma współrzędne GPS)</dd>
+                  <dt>[globe]</dt><dd>(string) <code>earth</code> dla Ziemi</dd>
+                  <dt>[dim]</dt><dd>szacowana wielkość obiektu (w metrach)</dd>
+                  <dt>[type]</dt><dd>rodzaj obiektu</dd>
+                  <dt>[name]</dt><dd>nazwa obiektu</dd>
+                  <dt>[country]</dt><dd>kod państwa w którym obiekt występuje</dd>
                 </dl>
               </dd>
-              <dt>length</dt>
-<dd>(int) długość artykułu (w bajtach)</dd>
-              <dt>[langlinks]</dt>
-<dd>mapa z kodu wersji językowej Wikipedii (string) w tytuł artykułu (lub przekierowania) w tej wersji językowej (string, znaki spacji NIE są zamieniane na podkreślenia).</dd>
-              <dt>[image_file]</dt>
-<dd>(string) nazwa pliku głównego obrazka artykułu</dd>
-              <dt>[cats]</dt>
-<dd>(list of long) lista identyfikatorów kategorii</dd>
-              <dt>[pagelinks]</dt>
-<dd>(list of string) lista identyfikatorów artykułów do których można przejść z bieżącego artykułu po linkach</dd>
-              <dt>[templates]</dt>
-<dd>(list of string) lista nazw szablonów (namespace 10) użytych w artykule (spacje zamienione na znaki podkreślenia), np. infoboksy</dd>
-              <dt>[prev]</dt>
-<dd>(map: string to int) skąd użytkownicy przeszli do artykułu; max. 20 pozycji
+              <dt>length</dt><dd>(int) długość artykułu (w bajtach)</dd>
+              <dt>[langlinks]</dt><dd>mapa z kodu wersji językowej Wikipedii (string) w tytuł artykułu (lub przekierowania) w tej wersji językowej (string, znaki spacji NIE są zamieniane na podkreślenia).</dd>
+              <dt>[image_file]</dt><dd>(string) nazwa pliku głównego obrazka artykułu</dd>
+              <dt>[cats]</dt><dd>(list of long) lista identyfikatorów kategorii</dd>
+              <dt>[pagelinks]</dt><dd>(list of string) lista identyfikatorów artykułów do których można przejść z bieżącego artykułu po linkach</dd>
+              <dt>[templates]</dt><dd>(list of string) lista nazw szablonów (namespace 10) użytych w artykule (spacje zamienione na znaki podkreślenia), np. infoboksy</dd>
+              <dt>[prev]</dt><dd>(map: string to int) skąd użytkownicy przeszli do artykułu; max. 20 pozycji
                 <ul>
                   <li>klucz: <i>pid</i>: identyfikator artykułu źródłowego lub łańcuch <code>other-*</code> (patrz opis w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream#Data_Preparation">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream#Data_Preparation</a>)
-                  </li>
-<li>wartość: <i>count</i>: liczba wejść z danego artykułu docelowego (zawsze &gt;= 10)
-                </li>
-</ul>
+                  <li>wartość: <i>count</i>: liczba wejść z danego artykułu docelowego (zawsze >= 10)
+                </ul>
               </dd>
-              <dt>[next]</dt>
-<dd>(map: string to int) dokąd użytkownicy poszli z artykułu; max. 20 pozycji
+              <dt>[next]</dt><dd>(map: string to int) dokąd użytkownicy poszli z artykułu; max. 20 pozycji
                 <ul>
                   <li>klucz: <i>pid</i>: identyfikator artykułu docelowego
-                  </li>
-<li>wartość: <i>count</i>: liczba wyjść do danego artykułu docelowego (zawsze &gt;= 10)
-                </li>
-</ul>
+                  <li>wartość: <i>count</i>: liczba wyjść do danego artykułu docelowego (zawsze >= 10)
+                </ul>
               </dd>
             </dl>
           </dd>
-          <dt>categories</dt>
-<dd>(list of map) lista kategorii drzewa kategorii zawierającego wszystkie artykuły wymienione w pliku; kolejność kategorii jest w kolejności obchodzenia drzewa w głąb począwszy od korzenia.<br>
+          <dt>categories</dt><dd>(list of map) lista kategorii drzewa kategorii zawierającego wszystkie artykuły wymienione w pliku; kolejność kategorii jest w kolejności obchodzenia drzewa w głąb począwszy od korzenia.<br/>
             Pola pojedynczej kategorii:
             <ul>
-              <li>
-<code>id</code>: identyfikator kategorii,
-              </li>
-<li>
-<code>title</code>: tytuł kategorii (spacje zamienione na znaki podkreślenia)
-              </li>
-<li>
-<code>parents</code>: lista identyfikatorów rodziców kategorii (pusta w przypadku korzenia)
-              </li>
-<li>
-<code>children</code>: lista identyfikatorów dzieci kategorii (pusta w przypadku liścia)
-              </li>
-<li>
-<code>wikidata_id</code>: identyfikator kategorii w WikiData
-              </li>
-<li>
-<code>is_meta</code>: <code>true</code> gdy to jest metakategoria, brak pola w przeciwnym przypadku
-              </li>
-<li>
-<code>articles_count</code>: liczba artykułów w tej kategorii (ale nie podkategoriach), brak pola gdy 0
-              </li>
-<li>
-<code>subtree_articles_count</code>: liczba artykułów w całym poddrzewie kategorii, włącznie z bieżącą
-              </li>
-<li>
-<code>subtree_cats_count</code>: liczba kategorii w całym poddrzewie (włącznie z bieżącą kategorią, a więc będzie zawsze co najmniej 1)
-              </li>
-<li>
-<code>langlinks</code>: mapa par w rodzaju "Category:18th-century people" zawierających linki do odpowiedników bieżącej kategorii w innych wersjach językowych Wikipedii
-            </li>
-</ul>
+              <li><code>id</code>: identyfikator kategorii,
+              <li><code>title</code>: tytuł kategorii (spacje zamienione na znaki podkreślenia)
+              <li><code>parents</code>: lista identyfikatorów rodziców kategorii (pusta w przypadku korzenia)
+              <li><code>children</code>: lista identyfikatorów dzieci kategorii (pusta w przypadku liścia)
+              <li><code>wikidata_id</code>: identyfikator kategorii w WikiData
+              <li><code>is_meta</code>: <code>true</code> gdy to jest metakategoria, brak pola w przeciwnym przypadku
+              <li><code>articles_count</code>: liczba artykułów w tej kategorii (ale nie podkategoriach), brak pola gdy 0
+              <li><code>subtree_articles_count</code>: liczba artykułów w całym poddrzewie kategorii, włącznie z bieżącą
+              <li><code>subtree_cats_count</code>: liczba kategorii w całym poddrzewie (włącznie z bieżącą kategorią, a więc będzie zawsze co najmniej 1)
+              <li><code>langlinks</code>: mapa par w rodzaju "Category:18th-century people" zawierających linki do odpowiedników bieżącej kategorii w innych wersjach językowych Wikipedii
+            </ul>
           </dd>
         </dl>
         <p>Logi z generowania plików <code>hour-pageview.json</code> są składowane w <code><i>DATA_DIR</i>/logs/hours-pageview-logs.txt</code> (ten plik jest nadpisywany co godzinę).</p>
@@ -252,480 +179,306 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
     ...
   ]
 }</pre>
-        <a name="4.3geo-by-*.png"></a><h3>4.3. geo-by-*.png</h3>
+        <h3>geo-by-*.png</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i></code> generowane są obrazy <code>geo-by-*.png</code>. Każdy z nich ma rozdzielczość 2400x1211 i czarne tło, a przedstawia mapę świata z białymi kropkami reprezentującymi artykuły Wikipedii. Jasność kropek odzwierciedla:</p>
         <dl class="dl-commands">
-          <dt>geo_by_pagecount.png</dt>
-<dd>liczbę artykułów w okolicy</dd>
-          <dt>geo_by_pagelen.png</dt>
-<dd>łączną długość artykułów (w znakach) w okolicy</dd>
-          <dt>geo_by_pageviews.png</dt>
-<dd>łączną popularność artykułów w ostatnim roku w okolicy</dd>
+          <dt>geo_by_pagecount.png</dt><dd>liczbę artykułów w okolicy</dd>
+          <dt>geo_by_pagelen.png</dt><dd>łączną długość artykułów (w znakach) w okolicy</dd>
+          <dt>geo_by_pageviews.png</dt><dd>łączną popularność artykułów w ostatnim roku w okolicy</dd>
         </dl>
         <p>Logi z tego procesu są składowane w <code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i>/geomap-logs.txt</code>.</p>
         
-        <a name="5Clickstream"></a><h2>5. Clickstream</h2>
+        <h2>Clickstream</h2>
         <p>Pliki clickstream udostępniane w <a href="https://dumps.wikimedia.org/other/clickstream">https://dumps.wikimedia.org/other/clickstream</a> i opisane w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream</a>. Są one generowane od 2017-11 co miesiąc tylko dla niektórych wersji językowych Wikipedii (de, en, es, fa, fr, it, ja, pl, pt, ru, zh), liczba języków zmienia się w czasie (początkowo było tylko de, en, es, ja, ru).</p>
         <p>Pliki clickstream <code>clickstream-<i>lang</i>wiki-<i>YYYY-MM</i>.tsv.gz</code> (domyślnie wszystkie) są zrzucane do <code><i>DATA_DIR</i>/cache/clickstream/<i>YYYY-MM</i></code>. Są one obecnie wykorzystywane do generowania plików <code><a href="#clickstream-articles">clickstream-articles.json.gz</a></code> oraz <code>hour-pageview.json</code> dla każdej wersji językowej Wikipedii.</p>
         <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/clickstream-logs.txt</code>.</p>
-        <a name="6Katalogi%20pageview"></a><h2>6. Katalogi pageview</h2>
+        <h2>Katalogi pageview</h2>
         <p>Pliki pageview mają po jednym rekordzie w wierszu, wiersz ma postać (dokładny opis - <a href="https://dumps.wikimedia.org/other/pagecounts-ez/">https://dumps.wikimedia.org/other/pagecounts-ez/</a>):</p>
         <ol>
           <li>kod językowy projektu (np. polska wikipedia to będzie 'pl.z')
-          </li>
-<li>tytuł artykułu (znaki spacji zamienione na podkreślenia)
-          </li>
-<li>liczba odwiedzin w danym przedziale czasu (np. miesiąca dla pageview miesięcznych)
-        </li>
-</ol>
+          <li>tytuł artykułu (znaki spacji zamienione na podkreślenia)
+          <li>liczba odwiedzin w danym przedziale czasu (np. miesiąca dla pageview miesięcznych)
+        </ol>
         <p>Plik pageview obejmuje wejścia na wszystkie projekty Wikimedia i wszystkie wersje językowe (nie tylko Wikipedie, ale też Wikiquote, Wikibooks itp.).</p>
         <pre>pl.z Rzeczpospolita_Polska 4596</pre>
-        <a name="6.1Miesi%C4%99czne"></a><h3>6.1. Miesięczne</h3>
+        <h3>Miesięczne</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/months</code> przechowywane są pliki <code>pagecounts-<i>YYYY-MM</i>-views-ge-5-totals.bz2</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pagecounts-ez/merged/">https://dumps.wikimedia.org/other/pagecounts-ez/merged/</a></code>.</p>
         <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej każdego projektu Wikimedia z granulacją miesięczną. Domyślnie system utrzymuje ostatnich 26 plików (miesięcy), potrzebnych jest minimum 12 - patrz zmienna środowiskowa <code>PAGEVIEW_MONTHS</code>. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
         <p>Pliki pageview miesięczne są wykorzystywane do generowania pliku <code><a href="#months-pageview-articles">months_pageview_articles.tsv.gz</a></code> dla każdej wersji językowej Wikipedii.</p>
         <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/pageview-months-logs.txt</code>.</p>
-        <a name="6.2Dobowe"></a><h3>6.2. Dobowe</h3>
+        <h3>Dobowe</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/days</code> przechowywane są pliki <code>pagecounts-<i>YYYY-MM-DD</i>.bz2</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pagecounts-ez/merged">https://dumps.wikimedia.org/other/pagecounts-ez/merged/<i>YYYY</i>/<i>YYYY-MM</i></a></code>.</p>
         <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej każdego projektu Wikimedia z granulacją dobową. Domyślnie system utrzymuje ostatnich 64 plików (dni), potrzebnych jest minimum 31 - patrz zmienna środowiskowa <code>PAGEVIEW_MONTHS</code>. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
         <p>Pliki pageview dobowe obecnie nie są wykorzystywane do generowania żadnych plików pochodnych.</p>
         <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/pageview-days-logs.txt</code>.</p>
-        <a name="6.3Godzinowe"></a><h3>6.3. Godzinowe</h3>
+        <h3>Godzinowe</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/hours</code> przechowywane są pliki <code>pageviews-<i>YYYYMMDD-HH</i>0000.gz</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pageviews">https://dumps.wikimedia.org/other/pageviews/<i>YYYY</i>/<i>YYYY-MM</i></a></code>.</p>
         <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej <b>tylko wybranych wersji językowych Wikipedii (en, de, fr, ru, it, es, pl, pt)</b>, z granulacją godzinną. Domyślnie system utrzymuje ostatnich 24 plików (godzin), potrzebnych jest minimum 24. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
         <p>Pliki pageview godzinowe są wykorzystywane do generowania pliku <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code>.</p>
         <p>Logi z procesu ściągania tych plików są składowane w <code><i>DATA_DIR</i>/logs/hours-pageview-logs.txt</code> (ten plik jest nadpisywany co godzinę).</p>
         
-        <a name="7Katalog%20dumpa"></a><h2>7. Katalog dumpa</h2>
+        <h2>Katalog dumpa</h2>
         <p><code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i></code>, np. <code>$DATA_DIR/cache/dumps/wikipedia/pl/20191220</code></p>
         <p>Tutaj trafiają przetworzone pliki danej wersji językowej Wikipedii, np. dla polskiej wersji z <a href="https://dumps.wikimedia.org/plwiki/">https://dumps.wikimedia.org/plwiki/</a></p>
-        <a name="7.1Pliki%20pierwotne"></a><h3>7.1. Pliki pierwotne</h3>
+        <h3>Pliki pierwotne</h3>
         <p>Artykuły (namespace 0), przekierowania (też namespace 0) i kategorie (namespace 14) mają wspólną przestrzeń identyfikatorów, tzn. np. nie może być artykułu o tym samym identyfikatorze co kategoria.
           Tytuły (artykułów, przekierowań, kategorii) zwykle są z dużej litery, spacje zamienione na znak podkreślenia (o ile nie wskazano inaczej). Wartości NULL są reprezentowane przez łańcuch pusty.</p>
         <dl class="dl-commands">
-          <dt>abstracts.tsv.gz</dt>
-<dd>
+          <dt>abstracts.tsv.gz</dt><dd>
             <p>Jednozdaniowe skróty artykułów. Często niestety śmieci zawierające znaki takie jak '|={}[]'.</p>
             <p>Pochodzenie: plik <code>*-abstract.xml.gz</code></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>page_id</code>: identyfikator artykułu
-              </li>
-<li>
-<code>abstract</code>: pierwsze zdanie artykułu
-            </li>
-</ol>
+              <li><code>page_id</code>: identyfikator artykułu
+              <li><code>abstract</code>: pierwsze zdanie artykułu
+            </ol>
             <p>Przykład:</p>
             <pre>40      Aminy – organiczne związki chemiczne zawierające w swojej budowie grupę aminową, będącą organiczną pochodną amoniaku.</pre>
           </dd>
-          <dt>article2category.tsv.gz</dt>
-<dd>
+          <dt>article2category.tsv.gz</dt><dd>
             <p>Kategorie artykułów. Jeden artykuł może należeć do wielu kategorii.</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Categorylinks_table">categorylinks</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>cl_from</code>: identyfikator artykułu
-              </li>
-<li>
-<code>cl_to</code>: identyfikator kategorii
-            </li>
-</ol>
+              <li><code>cl_from</code>: identyfikator artykułu
+              <li><code>cl_to</code>: identyfikator kategorii
+            </ol>
             <p>Przykład:</p>
             <pre>23992   330200</pre>
           </dd>
-          <dt>articles.tsv.gz</dt>
-<dd>
+          <dt>articles.tsv.gz</dt><dd>
             <p>Lista wszystkich artykułów hasłowych</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_table">page</a></p>
             <p>Ważniejsze pola:</p>
             <ol>
-              <li>
-<code>page_id</code>: Identyfikator artykułu
-              </li>
-<li>
-<code>page_title</code>: Tytuł artykułu
-              </li>
-<li>
-<code>page_len</code>: Długość artykułu (w bajtach)
-            </li>
-</ol>
+              <li><code>page_id</code>: Identyfikator artykułu
+              <li><code>page_title</code>: Tytuł artykułu
+              <li><code>page_len</code>: Długość artykułu (w bajtach)
+            </ol>
             <p>Przykład:</p>
             <pre>23992	Polska_Rzeczpospolita_Ludowa	351801</pre>
           </dd>
-          <dt>category2category.tsv.gz</dt>
-<dd>
+          <dt>category2category.tsv.gz</dt><dd>
             <p>Rodzice kategorii. Jedna kategoria może mieć wielu rodziców.</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Categorylinks_table">categorylinks</a>
-            </p>
-<p>Pola:</p>
+            <p>Pola:</p>
             <ol>
-              <li>
-<code>cl_from</code>: identyfikator kategorii (dziecka)
-              </li>
-<li>
-<code>cl_to</code>: identyfikator kategorii (ojca)
-            </li>
-</ol>
+              <li><code>cl_from</code>: identyfikator kategorii (dziecka)
+              <li><code>cl_to</code>: identyfikator kategorii (ojca)
+            </ol>
             <p>Przykład:</p>
             <pre>330200  2806702</pre>
           </dd>
-          <dt>category_index.tsv.gz</dt>
-<dd>
+          <dt>category_index.tsv.gz</dt><dd>
             <p>Lista wszystkich kategorii</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_table">page</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>page_id</code>: identyfikator kategorii
-              </li>
-<li>
-<code>page_title</code>: tytuł kategorii
-            </li>
-</ol>
+              <li><code>page_id</code>: identyfikator kategorii
+              <li><code>page_title</code>: tytuł kategorii
+            </ol>
             <p>Przykład:</p>
             <pre>64034   Państwa_w_Ameryce_Północnej</pre>
           </dd>
-          <dt>externallinks.tsv.gz</dt>
-<dd>
+          <dt>externallinks.tsv.gz</dt><dd>
             <p>Linki prowadzące z artykułów poza Wikipedię</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Externallinks_table">externallinks</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>el_from</code>: identyfikator artykułu w którym występuje link
-              </li>
-<li>
-<code>el_to</code>: URL linku
-            </li>
-</ol>
+              <li><code>el_from</code>: identyfikator artykułu w którym występuje link
+              <li><code>el_to</code>: URL linku
+            </ol>
             <p>Przykład:</p>
             <pre>170265  http://www.aiesec.pl</pre>
           </dd>
-          <dt>geo_tags.tsv.gz</dt>
-<dd>
+          <dt>geo_tags.tsv.gz</dt><dd>
             <p>Lista geotagowanych artykułów</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Extension:GeoData">geo_tags</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>gt_page_id</code>: identyfikator artykułu
-              </li>
-<li>
-<code>gt_lat</code>: szerokość geograficzna
-              </li>
-<li>
-<code>gt_lon</code>: długość geograficzna
-              </li>
-<li>
-<code>gt_globe</code>: planeta, np. 'earth' to Ziemia
-              </li>
-<li>
-<code>gt_primary</code>: '0' gdy artykuł luźno związany z miejscem, np. "mieszkała tu kiedyś Greta Garbo", wpp '1'
-              </li>
-<li>
-<code>gt_dim</code>: szacowana wielkość obiektu (w metrach)
-              </li>
-<li>
-<code>gt_type</code>: typ obiektu (często bez sensu i w przypadku plwiki w 85% puste)
-              </li>
-<li>
-<code>gt_name</code>: nazwa obiektu (w plwiki w 99,3% pole puste)
-              </li>
-<li>
-<code>gt_country</code>: kod kraju (w plwiki w 99,54% pole puste)
-              </li>
-<li>
-<code>gt_region</code>: kod regionu (w plwiki w 99% pole puste)
-            </li>
-</ol>
+              <li><code>gt_page_id</code>: identyfikator artykułu
+              <li><code>gt_lat</code>: szerokość geograficzna
+              <li><code>gt_lon</code>: długość geograficzna
+              <li><code>gt_globe</code>: planeta, np. 'earth' to Ziemia
+              <li><code>gt_primary</code>: '0' gdy artykuł luźno związany z miejscem, np. "mieszkała tu kiedyś Greta Garbo", wpp '1'
+              <li><code>gt_dim</code>: szacowana wielkość obiektu (w metrach)
+              <li><code>gt_type</code>: typ obiektu (często bez sensu i w przypadku plwiki w 85% puste)
+              <li><code>gt_name</code>: nazwa obiektu (w plwiki w 99,3% pole puste)
+              <li><code>gt_country</code>: kod kraju (w plwiki w 99,54% pole puste)
+              <li><code>gt_region</code>: kod regionu (w plwiki w 99% pole puste)
+            </ol>
             <p>Przykład:</p>
             <pre>77364   49.21472200     20.01333300     earth   1       1000                    PL</pre>
           </dd>
-          <dt>imagelinks.tsv.gz</dt>
-<dd>
+          <dt>imagelinks.tsv.gz</dt><dd>
             <p>Obrazki umieszczone w artykułach. W jednym artykule może być wiele obrazków</p>
             <p>Pochodzenie: <a href="https://www.mediawiki.org/wiki/Manual:Imagelinks_table">imagelinks</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>il_from</code>: identyfikator artykułu na którym jest obrazek
-              </li>
-<li>
-<code>il_to</code>: tytuł pliku obrazka
-            </li>
-</ol>
+              <li><code>il_from</code>: identyfikator artykułu na którym jest obrazek
+              <li><code>il_to</code>: tytuł pliku obrazka
+            </ol>
             <p>Przykład:</p>
             <pre>113902  010_Centrum,_Piekary_Slaskie,_Poland.jpg</pre>
           </dd>
-          <dt>langlinks_articles.tsv.gz</dt>
-<dd>
+          <dt>langlinks_articles.tsv.gz</dt><dd>
             <p>Odpowiedniki artykułu w innych wersjach językowych Wikipedii.</p>
             <p style="font-size: 80%;"><i>Since Wikidata, 'langlinks' table no longer keeps accurate track of the actual interlanguage links in Wikipedia and other Wikimedia wikis!</i></p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Langlinks_table"></a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>ll_from</code>: identyfikator artykułu
-              </li>
-<li>
-<code>ll_lang</code>: kod językowy wikipedii (np. <code>pl</code> polska, <code>en</code> angielska, <code>de</code> niemiecka)
-              </li>
-<li>
-<code>ll_title</code>: tytuł docelowego artykułu (spacje NIE są zamienione na znaki podkreślenia)
-            </li>
-</ol>
+              <li><code>ll_from</code>: identyfikator artykułu
+              <li><code>ll_lang</code>: kod językowy wikipedii (np. <code>pl</code> polska, <code>en</code> angielska, <code>de</code> niemiecka)
+              <li><code>ll_title</code>: tytuł docelowego artykułu (spacje NIE są zamienione na znaki podkreślenia)
+            </ol>
             <p>Przykład:</p>
             <pre>309170  en      Poland at the 1928 Winter Olympics</pre>
           </dd>
-          <dt>langlinks_categories.tsv.gz</dt>
-<dd>
+          <dt>langlinks_categories.tsv.gz</dt><dd>
             <p>Odpowiedniki kategorii w innych wersjach językowych Wikipedii.</p>
             <p style="font-size: 80%"><i>Since Wikidata, 'langlinks' table no longer keeps accurate track of the actual interlanguage links in Wikipedia and other Wikimedia wikis!</i></p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Langlinks_table">langlinks</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>ll_from</code>: identyfikator kategorii
-              </li>
-<li>
-<code>ll_lang</code>: kod językowy wikipedii
-              </li>
-<li>
-<code>ll_title</code>: tytuł docelowego artykułu (Uwaga: spacje nie są zamienione na znaki podkreślenia, tytuł zawiera prefiks, np. 'Kategoria:' dla ll_lang='pl')
-            </li>
-</ol>
+              <li><code>ll_from</code>: identyfikator kategorii
+              <li><code>ll_lang</code>: kod językowy wikipedii
+              <li><code>ll_title</code>: tytuł docelowego artykułu (Uwaga: spacje nie są zamienione na znaki podkreślenia, tytuł zawiera prefiks, np. 'Kategoria:' dla ll_lang='pl')
+            </ol>
             <p>Przykład:</p>
             <pre>1631643 de      Kategorie:Altkatholischer Bischof</pre>
           </dd>
-          <dt>langlinks_redirects.tsv.gz</dt>
-<dd>
+          <dt>langlinks_redirects.tsv.gz</dt><dd>
             <p>Odpowiedniki przekierowania w innych wersjach językowych Wikipedii.</p>
             <p style="font-size: 80%"><i>Since Wikidata, 'langlinks' table no longer keeps accurate track of the actual interlanguage links in Wikipedia and other Wikimedia wikis!</i></p>
             <p>Pochodzenie: <a href="https://www.mediawiki.org/wiki/Manual:Langlinks_table">langlinks</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>ll_from</code>: identyfikator przekierowania
-              </li>
-<li>
-<code>ll_lang</code>: kod językowy Wikipedii
-              </li>
-<li>
-<code>ll_title</code>: tytuł docelowego artykułu (Uwaga: spacje NIE są zamienione na znaki podkreślenia)
-            </li>
-</ol>
+              <li><code>ll_from</code>: identyfikator przekierowania
+              <li><code>ll_lang</code>: kod językowy Wikipedii
+              <li><code>ll_title</code>: tytuł docelowego artykułu (Uwaga: spacje NIE są zamienione na znaki podkreślenia)
+            </ol>
             <p>Przykład:</p>
             <pre>12147   en      Field theory (mathematics)</pre>
           </dd>
-          <dt>pagelinks.tsv.gz</dt>
-<dd>
+          <dt>pagelinks.tsv.gz</dt><dd>
             <p>Powiązania między artykułami. Jeśli po którejś stronie linku jest przekierowanie, to jest ono zastępowane odpowiadającym mu artykułem.</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Pagelinks_table">pagelinks</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>pl_from</code>: identyfikator artykułu zawierającego link do innego artykułu
-              </li>
-<li>
-<code>to_page_id</code>: identyfikator artykułu docelowego linku
-            </li>
-</ol>
+              <li><code>pl_from</code>: identyfikator artykułu zawierającego link do innego artykułu
+              <li><code>to_page_id</code>: identyfikator artykułu docelowego linku
+            </ol>
             <p>Przykład:</p>
             <pre>2549341 2546433</pre>
           </dd>
-          <dt>page_props_articles.tsv.gz</dt>
-<dd>
+          <dt>page_props_articles.tsv.gz</dt><dd>
             <p>Własności artykułów</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_props_table">page_props</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>pp_page</code>: identyfikator artykułu
-              </li>
-<li>
-<code>pp_propname</code>: nazwa własności (najciekawsza to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData)
-              </li>
-<li>
-<code>pp_value</code>: wartość własności
-            </li>
-</ol>
+              <li><code>pp_page</code>: identyfikator artykułu
+              <li><code>pp_propname</code>: nazwa własności (najciekawsza to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData)
+              <li><code>pp_value</code>: wartość własności
+            </ol>
             <p>Przykład:</p>
             <pre>4685628 wikibase_item   Q3472926</pre>
           </dd>
-          <dt>page_props_categories.tsv.gz</dt>
-<dd>
+          <dt>page_props_categories.tsv.gz</dt><dd>
             <p>Własności kategorii</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_props_table">page_props</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>pp_page</code>: identyfikator kategorii
-              </li>
-<li>
-<code>pp_propname</code>: nazwa własności (najciekawsze to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData, oraz 'hiddencat')
-              </li>
-<li>
-<code>pp_value</code>: wartość własności
-            </li>
-</ol>
+              <li><code>pp_page</code>: identyfikator kategorii
+              <li><code>pp_propname</code>: nazwa własności (najciekawsze to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData, oraz 'hiddencat')
+              <li><code>pp_value</code>: wartość własności
+            </ol>
             <p>Przykład:</p>
             <pre>64021   wikibase_item   Q2945667</pre>
           </dd>
-          <dt>page_props_redirects.tsv.gz</dt>
-<dd>
+          <dt>page_props_redirects.tsv.gz</dt><dd>
             <p>Własności przekierowań</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_props_table">page_props</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>pp_page</code>: identyfikator przekierowania
-              </li>
-<li>
-<code>pp_propname</code>: nazwa własności (najciekawsze to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData, oraz 'displaytitle')
-              </li>
-<li>
-<code>pp_value</code>: wartość własności
-            </li>
-</ol>
+              <li><code>pp_page</code>: identyfikator przekierowania
+              <li><code>pp_propname</code>: nazwa własności (najciekawsze to 'wikibase_item', czyli identyfikator odpowiednika artykułu w WikiData, oraz 'displaytitle')
+              <li><code>pp_value</code>: wartość własności
+            </ol>
             <p>Przykład:</p>
             <pre>20816   wikibase_item   Q11792035</pre>
           </dd>
-          <dt>page_restrictions.tsv.gz</dt>
-<dd>
+          <dt>page_restrictions.tsv.gz</dt><dd>
             <p>Artykuły zabezpieczone przed modyfikacją</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Page_restrictions_table">page_restrictions</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>pr_page</code>: identyfikator artykułu
-              </li>
-<li>
-<code>pr_type</code>: typ zabezpieczenia - "edit" lub "move"
-              </li>
-<li>
-<code>pr_level</code>: poziom zabezpieczenia - "sysop" dla pełnego zabezpieczenia, "autoconfirmed" dla pseudoprotekcji, "editor" dla pozostałych
-              </li>
-<li>
-<code>pr_cascade</code>: w praktyce zawsze '0' (czy zabezpieczone są wszystkie obiekty zawarte w artykule takie jak obrazki i szablony)
-              </li>
-<li>
-<code>pr_user</code>
-              </li>
-<li>
-<code>pr_expiry</code>
-            </li>
-</ol>
+              <li><code>pr_page</code>: identyfikator artykułu
+              <li><code>pr_type</code>: typ zabezpieczenia - "edit" lub "move"
+              <li><code>pr_level</code>: poziom zabezpieczenia - "sysop" dla pełnego zabezpieczenia, "autoconfirmed" dla pseudoprotekcji, "editor" dla pozostałych
+              <li><code>pr_cascade</code>: w praktyce zawsze '0' (czy zabezpieczone są wszystkie obiekty zawarte w artykule takie jak obrazki i szablony)
+              <li><code>pr_user</code>
+              <li><code>pr_expiry</code>
+            </ol>
           </dd>
-          <dt>redirects.tsv.gz</dt>
-<dd>
+          <dt>redirects.tsv.gz</dt><dd>
             <p>Przekierowania, czyli nazwy alternatywne. Np. 'PRL' jest nazwą alternatywną dla artykułu 'Polska Rzeczpospolita Ludowa'.</p>
             <p style="font-size: 80%;"><i>As of August 2007, database dumps for Wikipedia and other Wikimedia projects as provided on https://dumps.wikimedia.org/ have incomplete data in this table: only redirect pages that have been created or edited after summer 2007 are present. For older redirects, resort to using the pagelinks table.</i></p>
             <p>Pochodzenie: <a href="https://www.mediawiki.org/wiki/Manual:Page_table">page</a>, <a href="https://www.mediawiki.org/wiki/Manual:Redirect_table">redirect</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>redir_id</code>: identyfikator przekierowania
-              </li>
-<li>
-<code>article_id</code>: identyfikator artykułu, do którego prowadzi przekierowanie
-              </li>
-<li>
-<code>redir_title</code>: tytuł przekierowania (np. 'PRL')
-            </li>
-</ol>
+              <li><code>redir_id</code>: identyfikator przekierowania
+              <li><code>article_id</code>: identyfikator artykułu, do którego prowadzi przekierowanie
+              <li><code>redir_title</code>: tytuł przekierowania (np. 'PRL')
+            </ol>
             <p>Przykład:</p>
             <pre>4767    23992   PRL</pre>
           </dd>
-          <dt>templatelinks.tsv.gz</dt>
-<dd>
+          <dt>templatelinks.tsv.gz</dt><dd>
             <p>Uwzględniane są tylko powiązania artykułów namespace 0 z template'ami</p>
             <p>Pochodzenie: tabela <a href="https://www.mediawiki.org/wiki/Manual:Templatelinks_table">templatelinks</a></p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>tl_from</code>: identyfikator artykułu zawierającego szablon
-              </li>
-<li>
-<code>tl_namespace</code>: przestrzeń nazw szablonu (10 oznacza Template, 828 to Module (Lua))
-              </li>
-<li>
-<code>tl_title</code>: tytuł szablonu
-            </li>
-</ol>
+              <li><code>tl_from</code>: identyfikator artykułu zawierającego szablon
+              <li><code>tl_namespace</code>: przestrzeń nazw szablonu (10 oznacza Template, 828 to Module (Lua))
+              <li><code>tl_title</code>: tytuł szablonu
+            </ol>
             <p>Przykład:</p>
             <pre>3796860	10	Wieś_infobox</pre>
           </dd>
         </dl>
-        <a name="7.2Pliki%20wt%C3%B3rne"></a><h3>7.2. Pliki wtórne</h3>
+        <h3>Pliki wtórne</h3>
         <dl class="dl-commands">
-          <dt>categories.json.gz</dt>
-<dd>
+          <dt>categories.json.gz</dt><dd>
             <p>Na każdą kategorię przypada jeden wiersz - rekord JSON. Poszczególne pola rekordu oznaczają:</p>
             <ul>
-              <li>
-<code>id</code>: identyfikator kategorii,
-              </li>
-<li>
-<code>title</code>: tytuł kategorii (spacje zamienione na znaki podkreślenia)
-              </li>
-<li>
-<code>parents</code>: lista identyfikatorów rodziców kategorii (pusta w przypadku korzenia)
-              </li>
-<li>
-<code>children</code>: lista identyfikatorów dzieci kategorii (pusta w przypadku liścia)
-              </li>
-<li>
-<code>wikidata_id</code>: identyfikator kategorii w WikiData
-              </li>
-<li>
-<code>is_meta</code>: <code>true</code> gdy to jest metakategoria, brak pola w przeciwnym przypadku
-              </li>
-<li>
-<code>articles_count</code>: liczba artykułów w tej kategorii (ale nie podkategoriach), brak pola gdy 0
-              </li>
-<li>
-<code>subtree_articles_count</code>: liczba artykułów w całym poddrzewie kategorii, włącznie z bieżącą
-              </li>
-<li>
-<code>subtree_cats_count</code>: liczba kategorii w całym poddrzewie (włącznie z bieżącą kategorią, a więc będzie zawsze co najmniej 1)
-            </li>
-</ul>
+              <li><code>id</code>: identyfikator kategorii,
+              <li><code>title</code>: tytuł kategorii (spacje zamienione na znaki podkreślenia)
+              <li><code>parents</code>: lista identyfikatorów rodziców kategorii (pusta w przypadku korzenia)
+              <li><code>children</code>: lista identyfikatorów dzieci kategorii (pusta w przypadku liścia)
+              <li><code>wikidata_id</code>: identyfikator kategorii w WikiData
+              <li><code>is_meta</code>: <code>true</code> gdy to jest metakategoria, brak pola w przeciwnym przypadku
+              <li><code>articles_count</code>: liczba artykułów w tej kategorii (ale nie podkategoriach), brak pola gdy 0
+              <li><code>subtree_articles_count</code>: liczba artykułów w całym poddrzewie kategorii, włącznie z bieżącą
+              <li><code>subtree_cats_count</code>: liczba kategorii w całym poddrzewie (włącznie z bieżącą kategorią, a więc będzie zawsze co najmniej 1)
+            </ul>
             <p>Przykład:</p>
             <pre>{"id":3239599,"title":"Nieistniejące_kluby_sportowe_w_Stanach_Zjednoczonych","parents":[2198034,2197915],
 "children":[1026467,3239602], "wikidata_id":"Q8371215","articles_count":2,"subtree_articles_count":227,"subtree_cats_count":21}</pre>
           </dd>
-          <dt>
-<a name="clickstream-articles"></a>clickstream-articles.json.gz</dt>
-<dd>
+          <dt><a name="clickstream-articles"></a>clickstream-articles.json.gz</dt><dd>
             <ul>
-              <li>
-<code>_id</code>: identyfikator artykułu
-              </li>
-<li>
-<code>prev</code>: skąd użytkownicy przeszli do artykułu
+              <li><code>_id</code>: identyfikator artykułu
+              <li><code>prev</code>: skąd użytkownicy przeszli do artykułu
                 <ul>
-                  <li>
-<i>pid</i>: identyfikator artykułu źródłowego lub jeden z identyfikatorów <code>other-*</code> (patrz <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream#Data_Preparation">opis</a>). Identyfikator <code>other-search</code> oznacza że artykuł najprawdopodobniej został znaleziony w wyszukiwarce Wikipedii
-                  </li>
-<li>
-<i>count</i>: liczba wejść z danego źródła (zawsze &gt;= 10)
-                </li>
-</ul>
-              </li>
-<li>
-<code>next</code>: do jakiego artykułu użytkownicy przeszli
+                  <li><i>pid</i>: identyfikator artykułu źródłowego lub jeden z identyfikatorów <code>other-*</code> (patrz <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream#Data_Preparation">opis</a>). Identyfikator <code>other-search</code> oznacza że artykuł najprawdopodobniej został znaleziony w wyszukiwarce Wikipedii
+                  <li><i>count</i>: liczba wejść z danego źródła (zawsze >= 10)
+                </ul>
+              <li><code>next</code>: do jakiego artykułu użytkownicy przeszli
                 <ul>
-                  <li>
-<i>pid</i>: identyfikator artykułu docelowego
-                  </li>
-<li>
-<i>count</i>: liczba wyjść do danego artykułu docelowego (zawsze &gt;= 10)
-                </li>
-</ul>
-            </li>
-</ul>
+                  <li><i>pid</i>: identyfikator artykułu docelowego
+                  <li><i>count</i>: liczba wyjść do danego artykułu docelowego (zawsze >= 10)
+                </ul>
+            </ul>
             <p>W polach <code>prev</code> i <code>next</code> uwzględniono max. 20 przejść o największym wolumenie (pozostałe odrzucono).</p>
             <p>Przykład:</p>
             <pre>{
@@ -734,45 +487,29 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
   "next":{"108287":78,"38195":13,"86077":10}
 }</pre>
           </dd>
-          <dt>
-<a name="months-pageview-articles"></a>months_pageview_articles.tsv.gz</dt>
-<dd>
+          <dt><a name="months-pageview-articles"></a>months_pageview_articles.tsv.gz</dt><dd>
             <p>Plik zawiera informacje ile razy odwiedzono każdy artykuł Wikipedii w ciągu ostatnich 12 miesięcy.</p>
             <p>Pola:</p>
             <ol>
-              <li>
-<code>page_id</code> identyfikator artykułu
-              </li>
-<li>
-<code>page_title</code> tytuł artykułu
-              </li>
-<li>
-<code>views</code> liczba odwiedzin w ciągu ostatnich 12 miesięcy (może tu być 0)
-            </li>
-</ol>
+              <li><code>page_id</code> identyfikator artykułu
+              <li><code>page_title</code> tytuł artykułu
+              <li><code>views</code> liczba odwiedzin w ciągu ostatnich 12 miesięcy (może tu być 0)
+            </ol>
             <p>Przykład:</p>
             <pre>34257   Pilot_zdalnego_sterowania       3485</pre>
           </dd>
         </dl>
-        <a name="7.3Pliki%20log%C3%B3w"></a><h3>7.3. Pliki logów</h3>
+        <h3>Pliki logów</h3>
         <p>Tu są logi z poszczególnych faz zaciągania i przetwarzania dumpów Wikipedii. Gdy faza zakończyła się poprawnie, ostatni wiersz powinien zawierać napis "OK".</p>
         <dl class="dl-commands">
-          <dt>extract-logs.txt</dt>
-<dd>zaciąganie i przetwarzanie plików pierwotnych dumpa Wikipedii</dd>
-          <dt>cathier-logs.txt</dt>
-<dd>generowanie pliku <code>categories.json.gz</code>
-</dd>
-          <dt>months-pageview-logs.txt</dt>
-<dd>generowanie pliku <code>months_pageview_articles.tsv.gz</code>
-</dd>
-          <dt>clickstream-logs.txt</dt>
-<dd>generowanie pliku <code>clickstream-articles.json.gz</code>
-</dd>
-          <dt>geomap-logs.txt</dt>
-<dd>generowanie plików <code>geo-by-*.png</code> w katalogu <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i></code>
-</dd>
+          <dt>extract-logs.txt</dt><dd>zaciąganie i przetwarzanie plików pierwotnych dumpa Wikipedii</dd>
+          <dt>cathier-logs.txt</dt><dd>generowanie pliku <code>categories.json.gz</code></dd>
+          <dt>months-pageview-logs.txt</dt><dd>generowanie pliku <code>months_pageview_articles.tsv.gz</code></dd>
+          <dt>clickstream-logs.txt</dt><dd>generowanie pliku <code>clickstream-articles.json.gz</code></dd>
+          <dt>geomap-logs.txt</dt><dd>generowanie plików <code>geo-by-*.png</code> w katalogu <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i></code></dd>
         </dl>
       </div>
     </div>
   </body>
 </html>
+
