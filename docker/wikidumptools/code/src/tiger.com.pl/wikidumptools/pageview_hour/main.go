@@ -293,7 +293,7 @@ func downloadFile( filepath string, url string ) error {
 }
 
 func Main( args []string ) bool {
-  synthesis.GenerateCategoriesFlag = false
+  synthesis.GenerateCategoriesFlag = true
   synthesis.DisableFlags = map[string]bool { "page_restrictions": true, "displaytitle": true, "wikidata_id": true, "extract": true, "redirects": true, "externallinks": true, "modules": true, "imagelinks": true, "views": true, "extra": true }
 
   if len(args) < 1 {
