@@ -86,7 +86,8 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
         <p>Przykładowa zawartość:</p>
         <pre>TODO</pre>
         <h3>hour-pageview.json</h3>
-        <p>Nazwa pola ujęta w nawiasy kwadratowe oznacza że pole jest opcjonalne.</p>
+        <p>Pliki <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code> są generowane średnio co godzinę dla każdej wersji językowej Wikipedii wymienionej w zmiennej środowiskowej <code>WIKIPEDIA_LANGUAGES</code>.</p>
+        <p>W poniższym opisie nazwa pola ujęta w nawiasy kwadratowe oznacza że pole jest opcjonalne.</p>
         <dl class="dl-commands">
           <dt>ts_utc</dt><dd>na jaką godzinę aktualny jest plik (w formacie YYYY-MM-DD HH:00:00)</dd>
           <dt>articles</dt><dd>
