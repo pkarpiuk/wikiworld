@@ -93,6 +93,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
             <dl class="dl-commands">
               <dt>page_id</dt><dd>(long) identyfikator artykułu hasłowego</dd>
               <dt>title</dt><dd>(string) tytuł artykułu (znaki spacji zamienione na podkreślenia)</dd>
+              <dt>views</dt><dd>(list of int) lista 6 wartości liczbowych, które mówią ile było wejść do bieżącego artykułu w ciągu 1, 3, 6, 12, 24 ostatnich godzin oraz w ciągu ostatniego roku
               <dt>[gps]</dt><dd>
                 <p>Dokładne znaczenie pól <code>primary</code>, <code>globe</code>, <code>dim</code>, <code>type</code>, <code>name</code> i <code>country</code> na stronie <a href="https://www.mediawiki.org/wiki/Extension:GeoData">https://www.mediawiki.org/wiki/Extension:GeoData</a>. Tylko 3 pierwsze pola są sensownie wypełniane w każdej wersji językowej Wikipedii. Polska wersja językowa ma pozostałe pola wypełnione nierzetelnie (np. <code>dim</code>) lub wcale (w 99% przypadków).</p>
                 <dl class="dl-commands">
@@ -107,29 +108,85 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
                 </dl>
               </dd>
               <dt>length</dt><dd>(int) długość artykułu (w bajtach)</dd>
-              <dt>[langlinks]</dt><dd>mapa z kodu wersji językowej Wikipedii (string) w tytuł artykułu w tej wersji językowej (string, znaki spacji NIE są zamieniane na podkreślenia).</dd>
+              <dt>[langlinks]</dt><dd>mapa z kodu wersji językowej Wikipedii (string) w tytuł artykułu (lub przekierowania) w tej wersji językowej (string, znaki spacji NIE są zamieniane na podkreślenia).</dd>
               <dt>[image_file]</dt><dd>(string) nazwa pliku głównego obrazka artykułu</dd>
-              <dt>[cats]</dt><dd>lista identyfikatorów kategorii</dd>
+              <dt>[cats]</dt><dd>(list of long) lista identyfikatorów kategorii</dd>
               <dt>[pagelinks]</dt><dd>(list of string) lista identyfikatorów artykułów do których można przejść z bieżącego artykułu po linkach</dd>
-              <dt>[templates]</dt><dd>lista nazw szablonów użytych w artykule (spacje zamienione na znaki podkreślenia)</dd>
-              <dt>[prev]</dt><dd></dd>
-              <dt>[next]</dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
-              <dt></dt><dd></dd>
+              <dt>[templates]</dt><dd>(list of string) lista nazw szablonów (namespace 10) użytych w artykule (spacje zamienione na znaki podkreślenia), np. infoboksy</dd>
+              <dt>[prev]</dt><dd>(map: string to int) skąd użytkownicy przeszli do artykułu; max. 20 pozycji
+                <ul>
+                  <li>klucz: <i>pid</i>: identyfikator artykułu źródłowego lub łańcuch <code>other-*</code> (patrz opis w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream#Data_Preparation">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream#Data_Preparation</a>)
+                  <li>wartość: <i>count</i>: liczba wejść z danego artykułu docelowego (zawsze >= 10)
+                </ul>
+              </dd>
+              <dt>[next]</dt><dd>(map: string to int) dokąd użytkownicy poszli z artykułu; max. 20 pozycji
+                <ul>
+                  <li>klucz: <i>pid</i>: identyfikator artykułu docelowego
+                  <li>wartość: <i>count</i>: liczba wyjść do danego artykułu docelowego (zawsze >= 10)
+                </ul>
+              </dd>
             </dl>
           </dd>
+          <dt>categories</dt><dd>(list of map) lista kategorii drzewa kategorii zawierającego wszystkie artykuły wymienione w pliku; kolejność kategorii jest w kolejności obchodzenia drzewa w głąb począwszy od korzenia.<br/>
+            Pola pojedynczej kategorii:
+            <ul>
+              <li><code>id</code>: identyfikator kategorii,
+              <li><code>title</code>: tytuł kategorii (spacje zamienione na znaki podkreślenia)
+              <li><code>parents</code>: lista identyfikatorów rodziców kategorii (pusta w przypadku korzenia)
+              <li><code>children</code>: lista identyfikatorów dzieci kategorii (pusta w przypadku liścia)
+              <li><code>wikidata_id</code>: identyfikator kategorii w WikiData
+              <li><code>is_meta</code>: <code>true</code> gdy to jest metakategoria, brak pola w przeciwnym przypadku
+              <li><code>articles_count</code>: liczba artykułów w tej kategorii (ale nie podkategoriach), brak pola gdy 0
+              <li><code>subtree_articles_count</code>: liczba artykułów w całym poddrzewie kategorii, włącznie z bieżącą
+              <li><code>subtree_cats_count</code>: liczba kategorii w całym poddrzewie (włącznie z bieżącą kategorią, a więc będzie zawsze co najmniej 1)
+              <li><code>langlinks</code>: mapa par w rodzaju "Category:18th-century people" zawierających linki do odpowiedników bieżącej kategorii w innych wersjach językowych Wikipedii
+            </ul>
+          </dd>
         </dl>
+        <p>Logi z generowania plików <code>hour-pageview.json</code> są składowane w <code><i>DATA_DIR</i>/logs/hours-pageview-logs.txt</code> (ten plik jest nadpisywany co godzinę).</p>
         <p>Przykład:</p>
-        <pre></pre>
+        <pre>{
+  "ts_utc":"2020-01-10 14:00:00",
+  "articles":[
+    {
+      "page_id":6261,
+      "title":"Tarnów",
+      "views":[32,97,147,177,433,60693],
+      "gps":{"lat":50.029167,"lon":20.971667,"primary":true,"globe":"earth","dim":1000},
+      "length":205633,
+      "langlinks":{"de":"Tarnów","en":"Tarnów","es":"Tarnów","fr":"Tarnów","it":"Tarnów","pt":"Tarnów","ru":"Тарнув"},
+      "image_file":"Collage_of_views_of_Tarnow.png",
+      "cats":[105643,2433458,4198770,4305626,876108,3828329,3533348,3685580],
+      "pagelinks":["19413","44870","1275733","44902","6945","31966","44875","80810","4896","6261","6873","7075","4390","2728", ...],
+      "templates":["Polskie_miasto_infobox","Fakt","Ikona","Infobox_2x2","Układ_wielokolumnowy","Terytorium_zależne/core", ...]
+      "prev":{"3577":3152,"44895":766,"other-empty":23462,"other-external":2418,"other-internal":4706,"other-search":192828},
+      "next":{"5301":253}
+    },
+    ...
+  ],
+  "categories":[
+    {
+      "id":1382275,
+      "title":"Kategorie",
+      "parents":[],
+      "children":[66763,2545908,4548006,65389,66359,98093,637548,474179,66000,65388,70698,65702,169882,2411528],
+      "wikidata_id":"Q1281",
+      "subtree_articles_count":1509,
+      "subtree_cats_count":16799,
+      "langlinks":{"de":"Kategorie:!Haupt kategorie","en":"Category:Contents","es":"Categoría:Índice de categorías",
+                   "fr":"Catégorie:Accueil","it":"Categoria:Categorie","pt":"Categoria:Conteúdo","ru":"Категория:Всё"}
+    },
+    ...
+  ]
+}</pre>
         <h3>geo-by-*.png</h3>
+        <p>W katalogu <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i></code> generowane są obrazy <code>geo-by-*.png</code>. Każdy z nich ma rozdzielczość 2400x1211 i czarne tło, a przedstawia mapę świata z białymi kropkami reprezentującymi artykuły Wikipedii. Jasność kropek odzwierciedla:</p>
+        <dl class="dl-commands">
+          <dt>geo_by_pagecount.png</dt><dd>liczbę artykułów w okolicy</dd>
+          <dt>geo_by_pagelen.png</dt><dd>łączną długość artykułów (w znakach) w okolicy</dd>
+          <dt>geo_by_pageviews.png</dt><dd>łączną popularność artykułów w ostatnim roku w okolicy</dd>
+        </dl>
+        <p>Logi z tego procesu są składowane w <code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i>/geomap-logs.txt</code>.</p>
         
         <h2>Clickstream</h2>
         <p>Pliki clickstream udostępniane w <a href="https://dumps.wikimedia.org/other/clickstream">https://dumps.wikimedia.org/other/clickstream</a> i opisane w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream</a>. Są one generowane od 2017-11 co miesiąc tylko dla niektórych wersji językowych Wikipedii (de, en, es, fa, fr, it, ja, pl, pt, ru, zh), liczba języków zmienia się w czasie (początkowo było tylko de, en, es, ja, ru).</p>
@@ -158,7 +215,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
         <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/hours</code> przechowywane są pliki <code>pageviews-<i>YYYYMMDD-HH</i>0000.gz</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pageviews">https://dumps.wikimedia.org/other/pageviews/<i>YYYY</i>/<i>YYYY-MM</i></a></code>.</p>
         <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej <b>tylko wybranych wersji językowych Wikipedii (en, de, fr, ru, it, es, pl, pt)</b>, z granulacją godzinną. Domyślnie system utrzymuje ostatnich 24 plików (godzin), potrzebnych jest minimum 24. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
         <p>Pliki pageview godzinowe są wykorzystywane do generowania pliku <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code>.</p>
-        <p>
+        <p>Logi z procesu ściągania tych plików są składowane w <code><i>DATA_DIR</i>/logs/hours-pageview-logs.txt</code> (ten plik jest nadpisywany co godzinę).</p>
         
         <h2>Katalog dumpa</h2>
         <p><code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i></code>, np. <code>$DATA_DIR/cache/dumps/wikipedia/pl/20191220</code></p>
@@ -422,6 +479,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
                   <li><i>count</i>: liczba wyjść do danego artykułu docelowego (zawsze >= 10)
                 </ul>
             </ul>
+            <p>W polach <code>prev</code> i <code>next</code> uwzględniono max. 20 przejść o największym wolumenie (pozostałe odrzucono).</p>
             <p>Przykład:</p>
             <pre>{
   "_id":3672369,
@@ -448,7 +506,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
           <dt>cathier-logs.txt</dt><dd>generowanie pliku <code>categories.json.gz</code></dd>
           <dt>months-pageview-logs.txt</dt><dd>generowanie pliku <code>months_pageview_articles.tsv.gz</code></dd>
           <dt>clickstream-logs.txt</dt><dd>generowanie pliku <code>clickstream-articles.json.gz</code></dd>
-          <dt>geomap-logs.txt</dt><dd>generowanie plików <code>geo_by_*.png</code> w katalogu <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i></code></dd>
+          <dt>geomap-logs.txt</dt><dd>generowanie plików <code>geo-by-*.png</code> w katalogu <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i></code></dd>
         </dl>
       </div>
     </div>
