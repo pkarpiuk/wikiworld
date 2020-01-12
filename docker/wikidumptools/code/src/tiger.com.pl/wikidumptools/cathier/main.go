@@ -46,6 +46,10 @@ func (c *Category) AddLocalArticle( pageId int64 ) {
   c.localArticles[pageId] = true
 }
 
+func (c *Category) GetLocalArticles() map[int64]bool {
+  return c.localArticles
+}
+
 type Worker struct {
   Id int
   Marks map[int64]bool
@@ -186,18 +190,16 @@ func dump(w io.WriteCloser) {
 }
 
 func countSubTree( node *Category, marks map[int64]bool ) int {
-  sum := 0
   if marks == nil {
     marks = make(map[int64]bool)
   }
-  if !marks[node.Id] {
-    marks[node.Id] = true
-    sum = 1
-    for _, child := range node.children {
-      sum += countSubTree( child, marks )
+  marks[node.Id] = true
+  for _, child := range node.children {
+    if !marks[child.Id] {
+      countSubTree( child, marks )
     }
   }
-  return sum
+  return len(marks)
 }
 
 var RemovedNodes int = 0
@@ -213,6 +215,26 @@ func removeNode( node *Category ) {
   node.children = nil
   delete( CatsByPageId, node.Id )
   RemovedNodes += 1
+}
+
+// Usuwa wierzchołek, podciągając jego dzieci do jego ojca
+func ContractNode( node *Category, graph map[int64]*Category ) {
+  for _, parent := range( node.parents ) {
+    for articleId, _ := range node.localArticles {
+      parent.localArticles[articleId] = true
+    }
+    for _, child := range( node.children ) {
+      parent.children[child.Id] = child
+      child.parents[parent.Id] = parent
+    }
+    delete( parent.children, node.Id )
+  }
+  node.parents = nil
+  for _, child := range( node.children ) {
+    delete( child.parents, node.Id )
+  }
+  node.children = nil
+  delete( graph, node.Id )
 }
 
 var RemovedEdges int = 0
@@ -449,7 +471,7 @@ func ComputeGraphProps( rootNode *Category, graph map[int64]*Category, FullFlag 
     for workerNo := 0; workerNo < WorkersCount; workerNo++ {
       go func(workerNo int) {
         defer wg.Done()
-	GlobalWorkerSubtreeArticles( &Worker{ Id: workerNo }, ch )
+        GlobalWorkerSubtreeArticles( &Worker{ Id: workerNo }, ch )
       }(workerNo)
     }
     // delta := len(graph)/100

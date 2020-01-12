@@ -78,6 +78,7 @@ func (a *Article) toCache( cacheName string, value string ) {
 
 var AllArticlesById map[int64]*Article = make(map[int64]*Article)
 var AllRedirectsById map[string]*Article = make(map[string]*Article)
+// graf kategorii, ale tylko tych dotyczących artykułów ustawionych w SetArticleIds
 var CategoryGraph map[int64]*cathier.Category = make(map[int64]*cathier.Category)
 
 func CategoryGraphToSlice() []*cathier.Category {
@@ -380,12 +381,16 @@ func LoadCategories( fpath string ) {
 var RootNode *cathier.Category
 
 func buildCategoryGraph() {
+  // Tutaj w CategoryGraph mamy tylko te kategorie, do których bezpośrednio należą artykuły ustawione w SetArticleIds
+  // W poniższej pętli dodajemy do CategoryGraph wszystkie kategorie nadrzędne, aż do korzenia
   for {
     changeCounter := 0
     for _, cat := range CategoryGraph {
       if len(cat.Parents) == 0 {
-        RootNode = cat
-        fmt.Fprintf( os.Stderr, "ROOT NODE: '%s' (%s)\n", RootNode.Title, RootNode.Id )
+        if RootNode == nil {
+          RootNode = cat
+          fmt.Fprintf( os.Stderr, "ROOT NODE: '%s' (%s)\n", RootNode.Title, RootNode.Id )
+        }
       } else {
         for _, pid := range cat.Parents {
           if CategoryGraph[pid] == nil {
@@ -408,7 +413,9 @@ func buildCategoryGraph() {
     cat.Init()
     cat.LangLinks = make(map[string]string)
   }
+  // wypełniamy dla każdej kategorii pola 'parents' i 'children' na podstawie 'Parents' i 'Children'
   cathier.MakeLinks( CategoryGraph )
+  // wypełniamy dla każdej kategorii pole 'localArticles'
   for _, article := range AllArticlesById {
     if article != nil {
       for _, pid := range article.Cats {
@@ -420,6 +427,36 @@ func buildCategoryGraph() {
       }
     }
   }
+  utils.ProcessLocalFile( path.Join( LangDataDir, "langlinks_categories.tsv"), process_langlinks_categories_table, "\t", nil )
+  maxLangLinksCount := 0
+  for _, cat := range CategoryGraph {
+    l := len(cat.LangLinks)
+    if l > maxLangLinksCount { maxLangLinksCount = l }
+  }
+  // usuwamy kategorie, ktore maja len(LangLinks) < maxLangLinksCount (nigdy nie usuwamy roota)
+  fmt.Fprintf( os.Stdout, "All categories in graph: %d\n", len(CategoryGraph) )
+  removeCount := 0
+  for _, cat := range CategoryGraph {
+    if (cat != RootNode) && (len(cat.LangLinks) < maxLangLinksCount) {
+      cathier.ContractNode( cat, CategoryGraph )
+      removeCount += 1
+    }
+  }
+  fmt.Fprintf( os.Stdout, "Removed %d categories with < %d langlinks. All categories in graph: %d\n", removeCount, maxLangLinksCount, len(CategoryGraph) )
+  for _, article := range AllArticlesById {
+    if article != nil {
+      article.Cats = make([]int64, 0)
+    }
+  }
+  for _, cat := range CategoryGraph {
+    for articleId, _ := range cat.GetLocalArticles() {
+      article := AllArticlesById[articleId]
+      if article != nil {
+        article.Cats = append( article.Cats, cat.Id )
+      }
+    }
+  }
+  // wyliczamy własności 'ArticlesCount', 'SubtreeArticlesCount', 'SubtreeCatsCount', 'Children', 'Parents'
   cathier.ComputeGraphProps( RootNode, CategoryGraph, true )
 }
 
@@ -541,7 +578,6 @@ func Generate( langWiki string, w io.WriteCloser ) {
 
   if GenerateCategoriesFlag {
     buildCategoryGraph()
-    utils.ProcessLocalFile( path.Join( LangDataDir, "langlinks_categories.tsv"), process_langlinks_categories_table, "\t", nil )
   }
 
   if w != nil {
