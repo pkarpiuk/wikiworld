@@ -20,9 +20,12 @@
           <p>Narzędzie do ściągania i przetwarzania dumpów projektów Wikimedia</p>
         </div>
         <h2>Uruchamianie</h2>
-        <pre>$ export DATA_DIR=/mnt/arch/wiki-data
-$ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
-$ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools hourly</pre>
+        <pre>git clone https://github.com/pkarpiuk/wikiworld.git
+cd wikiworld/docker/wikidumptools
+docker build --no-cache=true -t wikidumptools .
+export DATA_DIR=/mnt/arch/wiki-data
+docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
+docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools hourly</pre>
         <h2>Zmienne środowiskowe</h2>
         <p>Musi być zdefiniowana i niepusta przynajmniej jedna z dwóch zmiennych: <code>WIKIPEDIA_LANGUAGES</code> lub <code>WIKIQUOTE_LANGUAGES</code>.</p>
         <dl class="dl-commands">
@@ -233,8 +236,36 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
         <p>Logi z procesu ściągania tych plików są składowane w <code><i>DATA_DIR</i>/logs/hours-pageview-logs.txt</code> (ten plik jest nadpisywany co godzinę).</p>
         
         <h2>Katalog dumpa</h2>
-        <p><code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i></code>, np. <code>$DATA_DIR/cache/dumps/wikipedia/pl/20191220</code></p>
         <p>Tutaj trafiają przetworzone pliki danej wersji językowej Wikipedii, np. dla polskiej wersji z <a href="https://dumps.wikimedia.org/plwiki/">https://dumps.wikimedia.org/plwiki/</a></p>
+        <p>Dla każdej wersji językowej Wikipedii wymienionej w zmiennej środowiskowej <code>WIKIPEDIA_LANGUAGES</code> tworzony jest katalog <code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i></code>, a w nim katalogi <code><i>YYYYMMDD</i></code> z wersjami przetworzonych dumpów danej wersji językowej Wikipedii, np. <code>$DATA_DIR/cache/dumps/wikipedia/pl/20191220</code> oraz linki symboliczne <code>current</code> i (opcjonalnie) <code>previous</code>.</p>
+        <p>Idea jest taka, że link symboliczny <code>current</code> wskazuje aktualnie używaną wersję dumpa, a <code>previous</code> poprzednio używaną (tak by można było się łatwo do niej cofnąć gdyby się okazało że bieżąca nie spełnia oczekiwań). Wywołanie 'wikidumptools daily' systematycznie sprawdza czy w <a href="https://dumps.wikimedia.org/plwiki/">https://dumps.wikimedia.org/<i>lang</i>/</a> pojawiła się nowa wersja dumpa i jeśli tak, to dociąga ją do odpowiedniego nowego katalogu <code><i>YYYYMMDD</i></code>. Zasadniczo w dłuższej perspektywie dla każdej wersji językowej Wikipedii będą przechowywane maksymalnie 4 wersje dumpów:</p>
+        <ul>
+          <li>najnowszy (ang. <i>latest</i>),
+          <li>najnowszy poprawny (ang. <i>latest valid</i>),
+          <li>bieżący (<code>current</code>),
+          <li>poprzedni (<code>previous</code>).
+        </ul>
+        <p>Może ich być mniej, ponieważ np. najnowszy, najnowszy poprawny i bieżący mogą być tożsame, a poprzedni może nie istnieć (tak jest zwykle po pierwszym cyklu działania polecenia 'wikidumptools daily'). Wersji dumpa nie powinno być więcej niż 4, ponieważ wszystkie pozostałe wersje są automatycznie usuwane.</p>
+        <p>Polecenie</p>
+        <pre>docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools switch <i>version</i> <i>options</i></pre>
+        <p>przełącza linki symboliczne <code>current</code> i <code>previous</code> stosownie do zaaplikowanych parametrów.</p>
+        <p><b>Uwaga</b>: przed uruchomieniem tego polecenia należy zatrzymać (<code>docker stop</code>) wszystkie inne wywołania narzędzia wikidumptools.</p>
+        <p><b>Uwaga</b>: na analogiczne wersje przepinany jest link symboliczny <code>current</code> w odpowiednim katalogu <code>DATA_DIR/public/wikipedia/<i>lang</i></code>.</p>
+        <p>Parametr <i>version</i> określa jaki zakres będzie miało przełączenie:</p>
+        <ul>
+          <li><code><i>lang</i></code> (np. <code>plwiki</code>, <code>enwiki</code> itp.) - wskazana wersja językowa,
+          <li><code>wiki</code> - wszystkie wersje językowe Wikipedii,
+          <li><code>wikiquote</code> - wszystkie wersje językowe Wikiquote,
+          <li><code>ALL</code> - wszystkie wersje językowej Wikipedii i Wikiquote.
+        </ul>
+        <p>Parametr <i>options</i> określa na jaką wersję dumpa ma zostać przepięty link symboliczny <code>current</code>:</p>
+        <ul>
+          <li><code>latest_valid</code> na najnowszy poprawny,
+          <li><code>latest</code> na najnowszy (niekoniecznie poprawny),
+          <li><code>previous</code> na poprzedni (rollback),
+          <li><code><i>YYYYMMDD</i></code> na konkretną wskazaną wersję dumpa
+        </ul>
+        <p>Jeśli dla danego dumpa przepięcie się uda, to link symboliczny <code>previous</code> będzie wskazywał na poprzedni cel linku symbolicznego <code>current</code>.</p>
         <h3>Pliki pierwotne</h3>
         <p>Artykuły (namespace 0), przekierowania (też namespace 0) i kategorie (namespace 14) mają wspólną przestrzeń identyfikatorów, tzn. np. nie może być artykułu o tym samym identyfikatorze co kategoria.
           Tytuły (artykułów, przekierowań, kategorii) zwykle są z dużej litery, spacje zamienione na znak podkreślenia (o ile nie wskazano inaczej). Wartości NULL są reprezentowane przez łańcuch pusty.</p>
