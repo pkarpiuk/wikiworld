@@ -15,22 +15,23 @@
   </head>
   <body>
 <div style="position: fixed; right: 10px; top: 10px; bottom: 10px; padding: 8px; margin: 8px; font-size: 90%; background-color: lightgray; border-style: solid; border-width: 2px; border-color: black;">
-1. <a href="#1Uruchamianie">Uruchamianie</a><br>
-2. <a href="#2Zmienne%20%C5%9Brodowiskowe">Zmienne środowiskowe</a><br>
-3. <a href="#3Struktura%20katalog%C3%B3w">Struktura katalogów</a><br>
-4. <a href="#4Public">Public</a><br>
-    4.1. <a href="#4.1downloader-stats.txt">downloader-stats.txt</a><br>
-    4.2. <a href="#4.2hour-pageview.json">hour-pageview.json</a><br>
-    4.3. <a href="#4.3geo-by-*.png">geo-by-*.png</a><br>
-5. <a href="#5Clickstream">Clickstream</a><br>
-6. <a href="#6Katalogi%20pageview">Katalogi pageview</a><br>
-    6.1. <a href="#6.1Miesi%C4%99czne">Miesięczne</a><br>
-    6.2. <a href="#6.2Dobowe">Dobowe</a><br>
-    6.3. <a href="#6.3Godzinowe">Godzinowe</a><br>
-7. <a href="#7Katalog%20dumpa">Katalog dumpa</a><br>
-    7.1. <a href="#7.1Pliki%20pierwotne">Pliki pierwotne</a><br>
-    7.2. <a href="#7.2Pliki%20wt%C3%B3rne">Pliki wtórne</a><br>
-    7.3. <a href="#7.3Pliki%20log%C3%B3w">Pliki logów</a><br>
+1. <a href="#Uruchamianie">Uruchamianie</a><br>
+2. <a href="#Zmienne%20%C5%9Brodowiskowe">Zmienne środowiskowe</a><br>
+3. <a href="#Ukryte%20zmienne">Ukryte zmienne</a><br>
+4. <a href="#Struktura%20katalog%C3%B3w">Struktura katalogów</a><br>
+5. <a href="#Public">Public</a><br>
+    5.1. <a href="#downloader-stats.txt">downloader-stats.txt</a><br>
+    5.2. <a href="#hour-pageview.json">hour-pageview.json</a><br>
+    5.3. <a href="#geo-by-*.png">geo-by-*.png</a><br>
+6. <a href="#Clickstream">Clickstream</a><br>
+7. <a href="#Katalogi%20pageview">Katalogi pageview</a><br>
+    7.1. <a href="#Miesi%C4%99czne">Miesięczne</a><br>
+    7.2. <a href="#Dobowe">Dobowe</a><br>
+    7.3. <a href="#Godzinowe">Godzinowe</a><br>
+8. <a href="#Katalog%20dumpa">Katalog dumpa</a><br>
+    8.1. <a href="#Pliki%20pierwotne">Pliki pierwotne</a><br>
+    8.2. <a href="#Pliki%20wt%C3%B3rne">Pliki wtórne</a><br>
+    8.3. <a href="#Pliki%20log%C3%B3w">Pliki logów</a><br>
 </div>
 
     <div class="container">
@@ -39,11 +40,11 @@
           <h1>Wikidumptools</h1>
           <p>Narzędzie do ściągania i przetwarzania dumpów projektów Wikimedia</p>
         </div>
-        <a name="1Uruchamianie"></a><h2>1. Uruchamianie</h2>
+        <a name="Uruchamianie"></a><h2>1. Uruchamianie</h2>
         <pre>$ export DATA_DIR=/mnt/arch/wiki-data
 $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
 $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools hourly</pre>
-        <a name="2Zmienne%20%C5%9Brodowiskowe"></a><h2>2. Zmienne środowiskowe</h2>
+        <a name="Zmienne%20%C5%9Brodowiskowe"></a><h2>2. Zmienne środowiskowe</h2>
         <p>Musi być zdefiniowana i niepusta przynajmniej jedna z dwóch zmiennych: <code>WIKIPEDIA_LANGUAGES</code> lub <code>WIKIQUOTE_LANGUAGES</code>.</p>
         <dl class="dl-commands">
           <dt>WIKIPEDIA_LANGUAGES</dt>
@@ -57,7 +58,30 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
           <dt>CLICKSTREAM_MONTHS</dt>
 <dd>Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
         </dl>
-        <a name="3Struktura%20katalog%C3%B3w"></a><h2>3. Struktura katalogów</h2>
+        <a name="Ukryte%20zmienne"></a><h2>3. Ukryte zmienne</h2>
+        <p><code>SupportedWikiLangs</code> to lista wersji językowych Wikipedii dla których narzędzie Wikidumptools ma najlepsze wsparcie edytorów, największą liczbę artykułów itp. Są to wersje:</p>
+        <ul>
+          <li>de (niemiecka)
+          </li>
+<li>en (angielska)
+          </li>
+<li>es (hiszpańska)
+          </li>
+<li>fr (francuska)
+          </li>
+<li>it (włoska)
+          </li>
+<li>ja (japońska)
+          </li>
+<li>pl (polska)
+          </li>
+<li>pt (portugalska)
+          </li>
+<li>ru (rosyjska)
+        </li>
+</ul>
+        <p>Zmienna ta ma znaczenie w przypadku clickstream i hours-pageview.</p>
+       <a name="Struktura%20katalog%C3%B3w"></a><h2>4. Struktura katalogów</h2>
         <pre>$DATA_DIR/
   cache/                   # da się łatwo odtworzyć
     clickstream/
@@ -67,7 +91,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
       months/              # tu pliki https://dumps.wikimedia.org/other/pagecounts-ez/merged/pagecounts-YYYY-MM-views-ge-5-totals.bz2
       days/                # tu pliki https://dumps.wikimedia.org/other/pagecounts-ez/merged/YYYY/YYYY-MM/pagecounts-YYYY-MM-DD.bz2
       hours/               # tu pliki https://dumps.wikimedia.org/other/pageviews/YYYY/YYYY-MM/pageviews-YYYYMMDD-HH0000.gz, 
-                           #   okrojone do wikipedii: en,de,fr,ru,it,es,pl,pt
+                           #   okrojone do SupportedWikiLangs (patrz wyżej)
     dumps/
       wikipedia/
         pl/                        # dumpy z https://dumps.wikimedia.org/plwiki/
@@ -105,13 +129,13 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
     wikipedia/
       createts/
 </pre>
-        <a name="4Public"></a><h2>4. Public</h2>
-        <a name="4.1downloader-stats.txt"></a><h3>4.1. downloader-stats.txt</h3>
+        <a name="Public"></a><h2>5. Public</h2>
+        <a name="downloader-stats.txt"></a><h3>5.1. downloader-stats.txt</h3>
         <p>Plik <code>public/downloader-stats.txt</code> zawiera podsumowanie zawartości drzewa katalogów z danymi (zakorzenionego w <i>DATA_DIR</i>). Generowany jest na zakończenie każdego cyklu procesu 'wikidumptools daily'.</p>
         <p>Przykładowa zawartość:</p>
         <pre>TODO</pre>
-        <a name="4.2hour-pageview.json"></a><h3>4.2. hour-pageview.json</h3>
-        <p>Pliki <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code> są generowane średnio co godzinę dla każdej wersji językowej Wikipedii wymienionej w zmiennej środowiskowej <code>WIKIPEDIA_LANGUAGES</code>.</p>
+        <a name="hour-pageview.json"></a><h3>5.2. hour-pageview.json</h3>
+        <p>Pliki <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code> są generowane średnio co godzinę dla każdej wersji językowej Wikipedii wymienionej w zmiennej środowiskowej <code>WIKIPEDIA_LANGUAGES</code> oraz <code><a href="#Ukryte%20zmienne">SupportedWikiLangs</a></code>. Każdy taki plik zawiera informacje o ok. 1000 najpopularniejszych artykułach w ostatnich max. 24 godzinach.</p>
         <p>W poniższym opisie nazwa pola ujęta w nawiasy kwadratowe oznacza że pole jest opcjonalne.</p>
         <dl class="dl-commands">
           <dt>ts_utc</dt>
@@ -181,7 +205,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
             </dl>
           </dd>
           <dt>categories</dt>
-<dd>(list of map) lista kategorii drzewa kategorii zawierającego wszystkie artykuły wymienione w pliku; kolejność kategorii jest w kolejności obchodzenia drzewa w głąb począwszy od korzenia.<br>
+<dd>(list of map) lista kategorii grafu kategorii zawierającego wszystkie artykuły wymienione w pliku; kolejność kategorii jest w kolejności obchodzenia grafu w głąb począwszy od korzenia. Uwaga: graf jest uproszczony, tzn. poprzez kontrakcję usunięto wierzchołki które nie mają langlinków do wszystkich języków wymienionych w <a href="#Ukryte%20zmienne">SupportedWikiLangs</a>. Dzięki temu np. dla angielskiej Wikipedii liczba kategorii redukuje się z ok. 100 tys. do ok. 7 tys.<br>
             Pola pojedynczej kategorii:
             <ul>
               <li>
@@ -253,7 +277,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
     ...
   ]
 }</pre>
-        <a name="4.3geo-by-*.png"></a><h3>4.3. geo-by-*.png</h3>
+        <a name="geo-by-*.png"></a><h3>5.3. geo-by-*.png</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i></code> generowane są obrazy <code>geo-by-*.png</code>. Każdy z nich ma rozdzielczość 2400x1211 i czarne tło, a przedstawia mapę świata z białymi kropkami reprezentującymi artykuły Wikipedii. Jasność kropek odzwierciedla:</p>
         <dl class="dl-commands">
           <dt>geo_by_pagecount.png</dt>
@@ -265,11 +289,11 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
         </dl>
         <p>Logi z tego procesu są składowane w <code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i>/geomap-logs.txt</code>.</p>
         
-        <a name="5Clickstream"></a><h2>5. Clickstream</h2>
-        <p>Pliki clickstream udostępniane w <a href="https://dumps.wikimedia.org/other/clickstream">https://dumps.wikimedia.org/other/clickstream</a> i opisane w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream</a>. Są one generowane od 2017-11 co miesiąc tylko dla niektórych wersji językowych Wikipedii (de, en, es, fa, fr, it, ja, pl, pt, ru, zh), liczba języków zmienia się w czasie (początkowo było tylko de, en, es, ja, ru).</p>
+        <a name="Clickstream"></a><h2>6. Clickstream</h2>
+        <p>Pliki clickstream udostępniane w <a href="https://dumps.wikimedia.org/other/clickstream">https://dumps.wikimedia.org/other/clickstream</a> i opisane w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream</a>. Są one generowane od 2017-11 co miesiąc tylko dla niektórych wersji językowych Wikipedii (<a href="#Ukryte%20zmienne">SupportedWikiLangs</a>).</p>
         <p>Pliki clickstream <code>clickstream-<i>lang</i>wiki-<i>YYYY-MM</i>.tsv.gz</code> (domyślnie wszystkie) są zrzucane do <code><i>DATA_DIR</i>/cache/clickstream/<i>YYYY-MM</i></code>. Są one obecnie wykorzystywane do generowania plików <code><a href="#clickstream-articles">clickstream-articles.json.gz</a></code> oraz <code>hour-pageview.json</code> dla każdej wersji językowej Wikipedii.</p>
         <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/clickstream-logs.txt</code>.</p>
-        <a name="6Katalogi%20pageview"></a><h2>6. Katalogi pageview</h2>
+        <a name="Katalogi%20pageview"></a><h2>7. Katalogi pageview</h2>
         <p>Pliki pageview mają po jednym rekordzie w wierszu, wiersz ma postać (dokładny opis - <a href="https://dumps.wikimedia.org/other/pagecounts-ez/">https://dumps.wikimedia.org/other/pagecounts-ez/</a>):</p>
         <ol>
           <li>kod językowy projektu (np. polska wikipedia to będzie 'pl.z')
@@ -281,26 +305,26 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
 </ol>
         <p>Plik pageview obejmuje wejścia na wszystkie projekty Wikimedia i wszystkie wersje językowe (nie tylko Wikipedie, ale też Wikiquote, Wikibooks itp.).</p>
         <pre>pl.z Rzeczpospolita_Polska 4596</pre>
-        <a name="6.1Miesi%C4%99czne"></a><h3>6.1. Miesięczne</h3>
+        <a name="Miesi%C4%99czne"></a><h3>7.1. Miesięczne</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/months</code> przechowywane są pliki <code>pagecounts-<i>YYYY-MM</i>-views-ge-5-totals.bz2</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pagecounts-ez/merged/">https://dumps.wikimedia.org/other/pagecounts-ez/merged/</a></code>.</p>
         <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej każdego projektu Wikimedia z granulacją miesięczną. Domyślnie system utrzymuje ostatnich 26 plików (miesięcy), potrzebnych jest minimum 12 - patrz zmienna środowiskowa <code>PAGEVIEW_MONTHS</code>. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
         <p>Pliki pageview miesięczne są wykorzystywane do generowania pliku <code><a href="#months-pageview-articles">months_pageview_articles.tsv.gz</a></code> dla każdej wersji językowej Wikipedii.</p>
         <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/pageview-months-logs.txt</code>.</p>
-        <a name="6.2Dobowe"></a><h3>6.2. Dobowe</h3>
+        <a name="Dobowe"></a><h3>7.2. Dobowe</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/days</code> przechowywane są pliki <code>pagecounts-<i>YYYY-MM-DD</i>.bz2</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pagecounts-ez/merged">https://dumps.wikimedia.org/other/pagecounts-ez/merged/<i>YYYY</i>/<i>YYYY-MM</i></a></code>.</p>
         <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej każdego projektu Wikimedia z granulacją dobową. Domyślnie system utrzymuje ostatnich 64 plików (dni), potrzebnych jest minimum 31 - patrz zmienna środowiskowa <code>PAGEVIEW_MONTHS</code>. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
         <p>Pliki pageview dobowe obecnie nie są wykorzystywane do generowania żadnych plików pochodnych.</p>
         <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/pageview-days-logs.txt</code>.</p>
-        <a name="6.3Godzinowe"></a><h3>6.3. Godzinowe</h3>
+        <a name="Godzinowe"></a><h3>7.3. Godzinowe</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/hours</code> przechowywane są pliki <code>pageviews-<i>YYYYMMDD-HH</i>0000.gz</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pageviews">https://dumps.wikimedia.org/other/pageviews/<i>YYYY</i>/<i>YYYY-MM</i></a></code>.</p>
-        <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej <b>tylko wybranych wersji językowych Wikipedii (en, de, fr, ru, it, es, pl, pt)</b>, z granulacją godzinną. Domyślnie system utrzymuje ostatnich 24 plików (godzin), potrzebnych jest minimum 24. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
+        <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej <b>tylko wybranych wersji językowych Wikipedii (<a href="#Ukryte%20zmienne">SupportedWikiLangs</a>)</b>, z granulacją godzinną. Domyślnie system utrzymuje ostatnich 24 plików (godzin), potrzebnych jest minimum 24. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
         <p>Pliki pageview godzinowe są wykorzystywane do generowania pliku <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code>.</p>
         <p>Logi z procesu ściągania tych plików są składowane w <code><i>DATA_DIR</i>/logs/hours-pageview-logs.txt</code> (ten plik jest nadpisywany co godzinę).</p>
         
-        <a name="7Katalog%20dumpa"></a><h2>7. Katalog dumpa</h2>
+        <a name="Katalog%20dumpa"></a><h2>8. Katalog dumpa</h2>
         <p><code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i></code>, np. <code>$DATA_DIR/cache/dumps/wikipedia/pl/20191220</code></p>
         <p>Tutaj trafiają przetworzone pliki danej wersji językowej Wikipedii, np. dla polskiej wersji z <a href="https://dumps.wikimedia.org/plwiki/">https://dumps.wikimedia.org/plwiki/</a></p>
-        <a name="7.1Pliki%20pierwotne"></a><h3>7.1. Pliki pierwotne</h3>
+        <a name="Pliki%20pierwotne"></a><h3>8.1. Pliki pierwotne</h3>
         <p>Artykuły (namespace 0), przekierowania (też namespace 0) i kategorie (namespace 14) mają wspólną przestrzeń identyfikatorów, tzn. np. nie może być artykułu o tym samym identyfikatorze co kategoria.
           Tytuły (artykułów, przekierowań, kategorii) zwykle są z dużej litery, spacje zamienione na znak podkreślenia (o ile nie wskazano inaczej). Wartości NULL są reprezentowane przez łańcuch pusty.</p>
         <dl class="dl-commands">
@@ -659,7 +683,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
             <pre>3796860	10	Wieś_infobox</pre>
           </dd>
         </dl>
-        <a name="7.2Pliki%20wt%C3%B3rne"></a><h3>7.2. Pliki wtórne</h3>
+        <a name="Pliki%20wt%C3%B3rne"></a><h3>8.2. Pliki wtórne</h3>
         <dl class="dl-commands">
           <dt>categories.json.gz</dt>
 <dd>
@@ -755,7 +779,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
             <pre>34257   Pilot_zdalnego_sterowania       3485</pre>
           </dd>
         </dl>
-        <a name="7.3Pliki%20log%C3%B3w"></a><h3>7.3. Pliki logów</h3>
+        <a name="Pliki%20log%C3%B3w"></a><h3>8.3. Pliki logów</h3>
         <p>Tu są logi z poszczególnych faz zaciągania i przetwarzania dumpów Wikipedii. Gdy faza zakończyła się poprawnie, ostatni wiersz powinien zawierać napis "OK".</p>
         <dl class="dl-commands">
           <dt>extract-logs.txt</dt>

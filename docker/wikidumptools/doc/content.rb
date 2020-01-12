@@ -35,7 +35,8 @@ headers.each do |node|
       breadcrumbs.pop
     end
     breadcrumbs[level] += 1
-    anchor = URI::encode( breadcrumbs.join('.') + node.text.strip )
+    # anchor = URI::encode( breadcrumbs.join('.') + node.text.strip )
+    anchor = URI::encode( node.text.strip )
     content_html += "#{'&nbsp;&nbsp;&nbsp;&nbsp;'*level}#{breadcrumbs.join('.')}. <a href=\"##{anchor}\">#{node.text.strip}</a><br/>\n"
     if node.parent.name != 'a' then
       node.replace('<a name="' + anchor + '"></a><' + node.name + '>' + "#{breadcrumbs.join('.')}. " + node.inner_html + '</' + node.name + '>')

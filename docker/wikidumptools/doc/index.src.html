@@ -32,7 +32,21 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
           <dt>PAGEVIEW_DAYS</dt><dd>Ile ostatnich plików dziennych pageview ściągnąć. Domyślnie 64, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
           <dt>CLICKSTREAM_MONTHS</dt><dd>Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
         </dl>
-        <h2>Struktura katalogów</h2>
+        <h2>Ukryte zmienne</h2>
+        <p><code>SupportedWikiLangs</code> to lista wersji językowych Wikipedii dla których narzędzie Wikidumptools ma najlepsze wsparcie edytorów, największą liczbę artykułów itp. Są to wersje:</p>
+        <ul>
+          <li>de (niemiecka)
+          <li>en (angielska)
+          <li>es (hiszpańska)
+          <li>fr (francuska)
+          <li>it (włoska)
+          <li>ja (japońska)
+          <li>pl (polska)
+          <li>pt (portugalska)
+          <li>ru (rosyjska)
+        </ul>
+        <p>Zmienna ta ma znaczenie w przypadku clickstream i hours-pageview.</p>
+       <h2>Struktura katalogów</h2>
         <pre>$DATA_DIR/
   cache/                   # da się łatwo odtworzyć
     clickstream/
@@ -42,7 +56,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
       months/              # tu pliki https://dumps.wikimedia.org/other/pagecounts-ez/merged/pagecounts-YYYY-MM-views-ge-5-totals.bz2
       days/                # tu pliki https://dumps.wikimedia.org/other/pagecounts-ez/merged/YYYY/YYYY-MM/pagecounts-YYYY-MM-DD.bz2
       hours/               # tu pliki https://dumps.wikimedia.org/other/pageviews/YYYY/YYYY-MM/pageviews-YYYYMMDD-HH0000.gz, 
-                           #   okrojone do wikipedii: en,de,fr,ru,it,es,pl,pt
+                           #   okrojone do SupportedWikiLangs (patrz wyżej)
     dumps/
       wikipedia/
         pl/                        # dumpy z https://dumps.wikimedia.org/plwiki/
@@ -86,7 +100,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
         <p>Przykładowa zawartość:</p>
         <pre>TODO</pre>
         <h3>hour-pageview.json</h3>
-        <p>Pliki <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code> są generowane średnio co godzinę dla każdej wersji językowej Wikipedii wymienionej w zmiennej środowiskowej <code>WIKIPEDIA_LANGUAGES</code>.</p>
+        <p>Pliki <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code> są generowane średnio co godzinę dla każdej wersji językowej Wikipedii wymienionej w zmiennej środowiskowej <code>WIKIPEDIA_LANGUAGES</code> oraz <code><a href="#Ukryte%20zmienne">SupportedWikiLangs</a></code>. Każdy taki plik zawiera informacje o ok. 1000 najpopularniejszych artykułach w ostatnich max. 24 godzinach.</p>
         <p>W poniższym opisie nazwa pola ujęta w nawiasy kwadratowe oznacza że pole jest opcjonalne.</p>
         <dl class="dl-commands">
           <dt>ts_utc</dt><dd>na jaką godzinę aktualny jest plik (w formacie YYYY-MM-DD HH:00:00)</dd>
@@ -128,7 +142,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
               </dd>
             </dl>
           </dd>
-          <dt>categories</dt><dd>(list of map) lista kategorii drzewa kategorii zawierającego wszystkie artykuły wymienione w pliku; kolejność kategorii jest w kolejności obchodzenia drzewa w głąb począwszy od korzenia.<br/>
+          <dt>categories</dt><dd>(list of map) lista kategorii grafu kategorii zawierającego wszystkie artykuły wymienione w pliku; kolejność kategorii jest w kolejności obchodzenia grafu w głąb począwszy od korzenia. Uwaga: graf jest uproszczony, tzn. poprzez kontrakcję usunięto wierzchołki które nie mają langlinków do wszystkich języków wymienionych w <a href="#Ukryte%20zmienne">SupportedWikiLangs</a>. Dzięki temu np. dla angielskiej Wikipedii liczba kategorii redukuje się z ok. 100 tys. do ok. 7 tys.<br/>
             Pola pojedynczej kategorii:
             <ul>
               <li><code>id</code>: identyfikator kategorii,
@@ -190,7 +204,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
         <p>Logi z tego procesu są składowane w <code><i>DATA_DIR</i>/cache/dumps/wikipedia/<i>lang</i>/<i>version</i>/geomap-logs.txt</code>.</p>
         
         <h2>Clickstream</h2>
-        <p>Pliki clickstream udostępniane w <a href="https://dumps.wikimedia.org/other/clickstream">https://dumps.wikimedia.org/other/clickstream</a> i opisane w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream</a>. Są one generowane od 2017-11 co miesiąc tylko dla niektórych wersji językowych Wikipedii (de, en, es, fa, fr, it, ja, pl, pt, ru, zh), liczba języków zmienia się w czasie (początkowo było tylko de, en, es, ja, ru).</p>
+        <p>Pliki clickstream udostępniane w <a href="https://dumps.wikimedia.org/other/clickstream">https://dumps.wikimedia.org/other/clickstream</a> i opisane w <a href="https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream">https://meta.wikimedia.org/wiki/Research:Wikipedia_clickstream</a>. Są one generowane od 2017-11 co miesiąc tylko dla niektórych wersji językowych Wikipedii (<a href="#Ukryte%20zmienne">SupportedWikiLangs</a>).</p>
         <p>Pliki clickstream <code>clickstream-<i>lang</i>wiki-<i>YYYY-MM</i>.tsv.gz</code> (domyślnie wszystkie) są zrzucane do <code><i>DATA_DIR</i>/cache/clickstream/<i>YYYY-MM</i></code>. Są one obecnie wykorzystywane do generowania plików <code><a href="#clickstream-articles">clickstream-articles.json.gz</a></code> oraz <code>hour-pageview.json</code> dla każdej wersji językowej Wikipedii.</p>
         <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/clickstream-logs.txt</code>.</p>
         <h2>Katalogi pageview</h2>
@@ -214,7 +228,7 @@ $ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptool
         <p>Logi ze ściągania tych plików są przechowywane w <code><i>DATA_DIR</i>/logs/pageview-days-logs.txt</code>.</p>
         <h3>Godzinowe</h3>
         <p>W katalogu <code><i>DATA_DIR</i>/cache/pageview/hours</code> przechowywane są pliki <code>pageviews-<i>YYYYMMDD-HH</i>0000.gz</code> ściągane z <code><a href="https://dumps.wikimedia.org/other/pageviews">https://dumps.wikimedia.org/other/pageviews/<i>YYYY</i>/<i>YYYY-MM</i></a></code>.</p>
-        <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej <b>tylko wybranych wersji językowych Wikipedii (en, de, fr, ru, it, es, pl, pt)</b>, z granulacją godzinną. Domyślnie system utrzymuje ostatnich 24 plików (godzin), potrzebnych jest minimum 24. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
+        <p>W pliku tego typu przechowywane są liczby odwiedzin każdego artykułu każdej wersji językowej <b>tylko wybranych wersji językowych Wikipedii (<a href="#Ukryte%20zmienne">SupportedWikiLangs</a>)</b>, z granulacją godzinną. Domyślnie system utrzymuje ostatnich 24 plików (godzin), potrzebnych jest minimum 24. Najstarsze pliki są usuwane, żeby nie zajmowały miejsca.</p>
         <p>Pliki pageview godzinowe są wykorzystywane do generowania pliku <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code>.</p>
         <p>Logi z procesu ściągania tych plików są składowane w <code><i>DATA_DIR</i>/logs/hours-pageview-logs.txt</code> (ten plik jest nadpisywany co godzinę).</p>
         
