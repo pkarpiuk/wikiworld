@@ -69,8 +69,10 @@ def process_language( db_fpath, articles_fpath, lang, geo_fpath )
   if $geoflag then
     Zlib::GzipReader.open( geo_fpath ) do |gz|
       while line = gz.gets do
-        page_id, rest = line.split( /\t/, 2 )
-        geoset.add( page_id.to_i )
+        page_id, lat, lon, globe, primary, rest = line.split( /\t/, 6 )
+        if primary == '1' then
+          geoset.add( page_id.to_i )
+        end
       end
     end
   end
@@ -116,7 +118,7 @@ Dir["#{dumps_dir}/*"].each do |dump_lc_dir|
   lang = File.basename( dump_lc_dir )
   dump_dir = File.join( dump_lc_dir, 'current' )
   if File.directory?( dump_dir ) then
-    db_dir = File.join( $data_dir, 'db', 'articles' )
+    db_dir = File.join( $data_dir, 'db', 'wikipedia', 'articles' )
     FileUtils.mkdir_p( db_dir )
     db_fpath = File.join( db_dir, "#{lang}.json" )
     articles_fpath = File.join( dump_dir, 'articles.tsv.gz' )
