@@ -33,7 +33,10 @@
     9.1. <a href="#Pliki%20pierwotne">Pliki pierwotne</a><br>
     9.2. <a href="#Pliki%20wt%C3%B3rne">Pliki wtórne</a><br>
     9.3. <a href="#Pliki%20log%C3%B3w">Pliki logów</a><br>
-10. <a href="#TODO">TODO</a><br>
+10. <a href="#DB">DB</a><br>
+    10.1. <a href="#Rest">Rest</a><br>
+    10.2. <a href="#Events">Events</a><br>
+11. <a href="#TODO">TODO</a><br>
 </div>
 
     <div class="container">
@@ -44,28 +47,33 @@
         </div>
         <a name="Wprowadzenie"></a><h2>1. Wprowadzenie</h2>
         <p>Wikidumptools to skonteneryzowane narzędzie, które zaciąga dumpy wybranych wersji językowych Wikipedii oraz dane statystyczne o wejściach użytkowników Wikipedii na artykuły hasłowe (tzw. <i>pageviews</i>: miesięczne, dobowe, godzinowe) oraz o historii przechodzenia użytkowników pomiędzy artykułami (tzw. <i>clickstream</i>). Narzędzie chodzi w pętli, automatycznie dociąga najnowsze wersje dumpów, pozwala na przełączanie się między wersjami dumpów (ustalenie która wersja jest aktualna na użytek innych aplikacji które z takiego dumpa korzystają) i usuwa niepotrzebne (stare) wersje żeby nie zużywać za dużo przestrzeni dyskowej.</p>
-        <p>Dane są zasadniczo zrzucane w formacie TSV i JSON (spakowane), w odróżnieniu od SQL i XML preferowanego przez twórców Wikipedii.</p>
+        <p>Dane są zasadniczo zrzucane w formacie TSV i JSON, w odróżnieniu od SQL i XML preferowanego przez twórców Wikipedii.</p>
         <p>Ponadto wikidumptools na kilka sposobów przetwarza zaciągnięte dane i generuje pewną wartość dodaną, np. obraz mapy świata pokazujący jakimi miejscami na świecie zainteresowani są użytkownicy danej wersji językowej Wikipedii w ostatnim roku, oraz informacje o 1000 najpopularniejszych artykułach w ciągu ostatnich 1,3,6,12,24 godzin dla każdej wersji językowej Wikipedii.</p>
         <a name="Uruchamianie"></a><h2>2. Uruchamianie</h2>
         <pre>git clone https://github.com/pkarpiuk/wikiworld.git
 cd wikiworld/docker/wikidumptools
 docker build --no-cache=true -t wikidumptools .
 export DATA_DIR=/mnt/arch/wiki-data
-docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
-docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools hourly</pre>
+docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
+docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db wikidumptools hourly
+docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db wikidumptools rest
+docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidumptools events</pre>
+        <p style="color: red"><b>Uwaga</b>: Nigdy nie należy uruchamiać więcej niż jednej instancji narzędzia z tymi samymi parametrami (np. dwóch instancji 'wikidumps daily'). Efektem będzie kaszanka w systemie plików, potencjalnie nieodwracalna.</p>
         <a name="Zmienne%20%C5%9Brodowiskowe"></a><h2>3. Zmienne środowiskowe</h2>
         <p>Musi być zdefiniowana i niepusta przynajmniej jedna z dwóch zmiennych: <code>WIKIPEDIA_LANGUAGES</code> lub <code>WIKIQUOTE_LANGUAGES</code>.</p>
         <dl class="dl-commands">
           <dt>WIKIPEDIA_LANGUAGES</dt>
-<dd>Lista rozdzielonych spacją wersji językowych Wikipedii, które mają być ściągane, np. 'pl en de'.</dd>
+<dd>(daily) Lista rozdzielonych spacją wersji językowych Wikipedii, które mają być ściągane, np. 'pl en de'.</dd>
           <dt>WIKIQUOTE_LANGUAGES</dt>
-<dd>Lista rozdzielonych spacją wersji językowych Wikicytatów, które mają być ściągane, np. 'pl en de'</dd>
+<dd>(daily) Lista rozdzielonych spacją wersji językowych Wikicytatów, które mają być ściągane, np. 'pl en de'</dd>
           <dt>PAGEVIEW_MONTHS</dt>
-<dd>Ile ostatnich plików miesięcznych pageview ściągnąć. Domyślnie 26, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
+<dd>(daily) Ile ostatnich plików miesięcznych pageview ściągnąć. Domyślnie 26, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
           <dt>PAGEVIEW_DAYS</dt>
-<dd>Ile ostatnich plików dziennych pageview ściągnąć. Domyślnie 64, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
+<dd>(daily) Ile ostatnich plików dziennych pageview ściągnąć. Domyślnie 64, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
           <dt>CLICKSTREAM_MONTHS</dt>
-<dd>Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
+<dd>(daily) Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
+          <dt>EVENTS_DAYS</dt>
+<dd>(events) Z ilu ostatnich dni przechowywać zdarzenia modyfikacji/tworzenia artykułów. Domyślnie 64, 0 oznacza wszystkie</dd>
         </dl>
         <a name="Ukryte%20zmienne"></a><h2>4. Ukryte zmienne</h2>
         <p><code>SupportedWikiLangs</code> to lista wersji językowych Wikipedii dla których narzędzie Wikidumptools ma najlepsze wsparcie. Są to wersje:</p>
@@ -87,6 +95,8 @@ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools 
 <li>pt (portugalska)
           </li>
 <li>ru (rosyjska)
+          </li>
+<li>zh (chińska)
         </li>
 </ul>
         <p>Zmienna ta ma znaczenie w przypadku clickstream i hours-pageview.</p>
@@ -136,7 +146,17 @@ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools 
     wikiquote/
   db/                      # trudno się odtwarza
     wikipedia/
-      createts/
+      articles/
+        pl.json
+        en.json
+        ...
+    wikiquote/
+    events/
+      raw/                 # zdarzenia tworzenia i modyfikacji artykułów
+        2020-01-07.json
+        2020-01-08.json
+        ...
+      stats/
 </pre>
         <a name="Public"></a><h2>6. Public</h2>
         <a name="downloader-stats.txt"></a><h3>6.1. downloader-stats.txt</h3>
@@ -854,8 +874,190 @@ docker run --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools 
 <dd>generowanie plików <code>geo-by-*.png</code> w katalogu <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i></code>
 </dd>
         </dl>
+        <a name="DB"></a><h2>10. DB</h2>
+        <p>W katalogu <code><i>DATA_DIR</i>/db</code> przechowywane są takie dane, które trudno odtworzyć, więc zasadniczo nie powinno się tego katalogu usuwać, a przy przenoszeniu całej infrastruktury na inną maszynę warto go spakować i odtworzyć na nowej lokalizacji.</p>
+        <a name="Rest"></a><h3>10.1. Rest</h3>
+        <p>W udostępnianych publicznie plikach dumpów pewne ciekawe dane są trudno dostępne lub wręcz niedostępne. Dla każdej wersji językowej Wikipedii w pliku <code><i>DATA_DIR</i>/db/wikipedia/articles/<i>lang</i>.json</code> przechowujemy ściągnięte przez API Wikipedii rekordy o poszczególnych artykułach:</p>
+        <ul>
+          <li>
+<code>page_id</code>: (int) identyfikator artykułu
+          </li>
+<li>
+<code>download_ts</code>: (string) data utworzenia rekordu (ściągnięcia danych z Internetu), w formacie. "2020-01-17T15:36:42+01:00"
+          </li>
+<li>
+<code>create_ts</code>: (string) data utworzenia pierwszej rewizji artykułu, w formacie. "2002-07-27T00:34:39Z" (<a href="https://www.mediawiki.org/wiki/API:Revisions">Wikipedia API DOC</a>)
+          </li>
+<li>
+<code>summary</code>: (JSON) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/summary/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>)
+          </li>
+<li>
+<code>media</code>: (JSON) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/media/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>)
+          </li>
+<li>
+<code>related</code>: (JSON) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/related/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>)
+        </li>
+</ul>
+        <p>Narzędzie 'wikidumptools rest' chodzi w kółko i uzupełnia pliki. Dba żeby dane były zawsze aktualne (np. o obrazkach), można założyć że podmiana pliku odbywa się w sposób atomowy. Plik co pewien czas jest automatycznie kompresowany (można założyć że w sposób atomowy), ale zasadniczo w pliku może być wiele rekordów z danym page_id, najświeższy jest rekord ostatni.</p>
+        <p>Przykład rekordu:</p>
+        <pre>{
+  "page_id": 30,
+  "download_ts": "2020-01-17T01:47:54+00:00",
+  "create_ts": "2001-11-11T07:39:07Z",
+  "summary": {
+    "title": "Przylądek Igielny",
+    "displaytitle": "Przylądek Igielny",
+    "wikibase_item": "Q4085",
+    "titles": {
+      "canonical": "Przylądek_Igielny",
+      "normalized": "Przylądek Igielny",
+      "display": "Przylądek Igielny"
+    },
+    "pageid": 30,
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Agulhas.jpg/320px-Agulhas.jpg",
+      "width": 320,
+      "height": 240
+    },
+    "originalimage": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Agulhas.jpg",
+      "width": 1600,
+      "height": 1200
+    },
+    "description": "przylądek w Południowej Afryce",
+    "coordinates": {
+      "lat": -34.833333,
+      "lon": 20.002542
+    },
+    "extract": "Przylądek Igielny, Przylądek Agulhas – przylądek stanowiący najbardziej wysunięty ...",
+    "extract_html": "&lt;p&gt;&lt;b&gt;Przylądek Igielny&lt;/b&gt;, &lt;b&gt;Przylądek Agulhas&lt;/b&gt; – przylądek stanowiący ...&lt;/p&gt;",
+    ...
+  },
+  "media": {
+    "items": [
+      {
+        "section_id": 0,
+        "type": "image",
+        "showInGallery": true,
+        "srcset": [
+          {
+            "src": "//upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Agulhas.jpg/640px-Agulhas.jpg",
+            "scale": "1x"
+          },
+          {
+            "src": "//upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Agulhas.jpg/1280px-Agulhas.jpg",
+            "scale": "2x"
+          },
+          {
+            "src": "//upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Agulhas.jpg/960px-Agulhas.jpg",
+            "scale": "1.5x"
+          }
+        ],
+        "titles": {
+          "canonical": "File:Agulhas.jpg",
+          "normalized": "Plik:Agulhas.jpg",
+          "display": "Plik:Agulhas.jpg"
+        },
+        "thumbnail": {
+          "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Agulhas.jpg/320px-Agulhas.jpg",
+          "width": 320,
+          "height": 240,
+          "mime": "image/jpeg"
+        },
+        "original": {
+          "source": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Agulhas.jpg",
+          "width": 1600,
+          "height": 1200,
+          "mime": "image/jpeg"
+        },
+        "file_page": "https://commons.wikimedia.org/wiki/File:Agulhas.jpg",
+        "license": {
+          "type": "CC BY-SA 2.0",
+          "code": "cc-by-sa-2.0",
+          "url": "https://creativecommons.org/licenses/by-sa/2.0"
+        },
+        "artist": {
+          "html": ...
+          "text": "File:South Africa location map.svg by NordNordWest\n\nderivative work by Htonl"
+        },
+        "credit": {
+          "html": ...
+          "text": "File:South Africa location map.svg\nSRTM\nETOPO1"
+        },
+        "wb_entity_id": "M45107",
+      },
+      ...
+    ],
+  ...
+  "related": {
+    "pages": [
+      {
+        <i>format taki sam jak w polu "summary"</i>
+      },
+     ...
+  ]
+}</pre>
+        <a name="Events"></a><h3>10.2. Events</h3>
+        <p>Polecenie 'wikidumptools events' subskrybuje <a href="https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams">strumień zmian</a> (i tworzenia nowych) artykułów w projektach Wikimedia Foundation (a więc we wszystkich wersjach językowych Wikipedii, Wikiquote, WikiNews, Wikidata, itp.) dokonanych przez użytkowników (a więc nie przez boty) i metadane o tych zmianach zapisuje w plikach <code><i>DATA_DIR</i>/db/events/raw/<i>YYYY-MM-DD</i>.json</code>. Trzymane są pliki z ostatnich <code>EVENTS_DAYS</code> dni (domyślnie 64).</p>
+        <p>Obserwowany strumień nosi nazwę <code>recentchange</code>. Inne potencjalnie interesujące strumienie (ale nie obsługiwane przez narzędzie wikidumptools) są opisane <a href="https://stream.wikimedia.org/?doc#/Streams">tu</a>.</p>
+        <p>Struktura generowanych przez Wikimedia Foundation zdarzeń opisana jest <a href="https://www.mediawiki.org/wiki/Manual:RCFeed">tu</a>.</p>
+        <p>W plikach trzymane są tylko zdarzenia, które spełniają wszystkie poniższe warunki naraz:</p>
+        <ul>
+          <li>pole <code>type</code> ma wartość 'new' lub 'edit'
+          </li>
+<li>pole <code>namespace</code> ma wartość 0
+          </li>
+<li>pole <code>bot</code> ma wartość 0.
+        </li>
+</ul>
+        <p>Aby dodatkowo zredukować ilość zajmowanego na dysku miejsca, rekordy w plikach ograniczone są do pól:</p>
+        <ul>
+          <li>
+<code>type</code>: 'new' lub 'edit'
+          </li>
+<li>
+<code>wiki</code>: nazwa projektu, np. 'plwiki', 'wikidatawiki', 'enwiktionary' itp.
+          </li>
+<li>
+<code>title</code>: tytuł artykułu
+          </li>
+<li>
+<code>[comment]</code>: opcjonalny komentarz modyfikacji
+          </li>
+<li>
+<code>timestamp</code>: data zdarzenia (UNIX)
+          </li>
+<li>
+<code>user</code>: nazwa użytkownika dokonującego zmiany
+          </li>
+<li>
+<code>[minor]</code>: true gdy jest to drobna zmiana, brak pola gdy false
+          </li>
+<li>
+<code>[patrolled]</code>: true gdy zmiana jest patrolowana, brak pola gdy false
+          </li>
+<li>
+<code>length</code>: jak zmieniła się długość (w bajtach) artykułu po modyfikacji: <pre>{ new: <i>val-new</i>, old: <i>val-old</i> }</pre> Wartość <i>val-old</i> może wynosić -1 gdy utworzono pierwszą wersję artykułu
+          </li>
+<li>
+<code>revisions</code>: numer starej i nowej rewizji artykułu, format danych taki sam jak w poprzednim polu
+        </li>
+</ul>
+        <p>Przykład:</p>
+        <pre>{
+  "type": "edit",
+  "wiki": "plwiki",
+  "title": "Mandaryna",
+  "comment": "Poprawienie nieprawdziwej informacji - uczyła się śpiewu, ale nie u p. Zapendowskiej",
+  "timestamp": 1579268095,
+  "user": "37.7.187.10",
+  "minor": true,
+  "patrolled": true,
+  "length": { "old": 28072, "new": 28029 },
+  "revision": { "old": 58549400, "new": 58551390 }
+}</pre>
         <div style="color: red">
-          <a name="TODO"></a><h2>10. TODO</h2>
+          <a name="TODO"></a><h2>11. TODO</h2>
           <ul>
             <li>Wskazówki ile miejsca w praktyce mogą zajmować poszczególne katalogi z danymi,
             </li>
