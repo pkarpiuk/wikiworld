@@ -99,7 +99,12 @@ def extract_and_cathier( dates_map, lc, suffix, wiki_type )
         `touch '#{log_path}'`
       end
     end
-    status = wikidumptools_run( dump_dir, PHASE_NAME_EXTRACT, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} extract net #{lc}#{suffix} tsv" )
+    status = 0
+    counter = 0
+    begin
+      counter += 1
+      status = wikidumptools_run( dump_dir, PHASE_NAME_EXTRACT, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} extract net #{lc}#{suffix} tsv" )
+    end while (status != 0) && (counter < 3)
     if status == 0 then
       status = wikidumptools_run( dump_dir, PHASE_NAME_MONTHS_PAGEVIEW, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} months-pageview #{lc}#{suffix} 12" )
       status = wikidumptools_run( dump_dir, PHASE_NAME_CATHIER, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} cathier #{lc}#{suffix} full" )
@@ -107,18 +112,17 @@ def extract_and_cathier( dates_map, lc, suffix, wiki_type )
         status = wikidumptools_run( dump_dir, PHASE_NAME_GEOMAP, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} geomap #{lc}#{suffix}" )
         status = wikidumptools_run( dump_dir, PHASE_NAME_CLICKSTREAM, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} clickstream #{lc}#{suffix}" )
       end
-    end
-    current_dir = File.join( wiki_dir, 'current' )
-    current_public_dir = File.join( wiki_public_dir, 'current' )
-    if !File.exist?( current_dir ) then
-      File.symlink( dump_date, current_dir )
-      begin
-        File.unlink( current_public_dir )
-      rescue
+      current_dir = File.join( wiki_dir, 'current' )
+      current_public_dir = File.join( wiki_public_dir, 'current' )
+      if !File.exist?( current_dir ) then
+        File.symlink( dump_date, current_dir )
+        begin
+          File.unlink( current_public_dir )
+        rescue
+        end
+        File.symlink( dump_date, current_public_dir )
       end
-      File.symlink( dump_date, current_public_dir )
     end
-    return status
   end
 end
 
