@@ -101,10 +101,15 @@ def extract_and_cathier( dates_map, lc, suffix, wiki_type )
     end
     status = 0
     counter = 0
-    begin
+    while true
       counter += 1
       status = wikidumptools_run( dump_dir, PHASE_NAME_EXTRACT, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} extract net #{lc}#{suffix} tsv" )
-    end while (status != 0) && (counter < 3)
+      if status == 0 || counter > 3 then
+        break
+      else
+        sleep 60
+      end
+    end
     if status == 0 then
       status = wikidumptools_run( dump_dir, PHASE_NAME_MONTHS_PAGEVIEW, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} months-pageview #{lc}#{suffix} 12" )
       status = wikidumptools_run( dump_dir, PHASE_NAME_CATHIER, "docker run --rm -v '#{$DATA_DIR}':/db wikidumptools --dump=#{dump_date} cathier #{lc}#{suffix} full" )
