@@ -30,7 +30,7 @@ def curl(url, extra="")
   return result
 end
 
-def process_language_inner( db_fpath, articles_fpath, lang, was_page_ids )
+def process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset )
   line_counter = 0
   open( db_fpath, 'w') do |fout|
     Zlib::GzipReader.open( articles_fpath ) do |gz|
@@ -42,17 +42,19 @@ def process_language_inner( db_fpath, articles_fpath, lang, was_page_ids )
           if line_counter % 10 == 0 then
             puts "#{lang} #{line_counter} #{page_id} #{page_title}"
           end
-          if page_id % $divider == $rest then
-            if !was_page_ids.include?( page_id ) then
-              record = { 'page_id' => page_id, 'download_ts' => DateTime.now.to_s }
-              cgi_title = CGI::escape( page_title.gsub( ' ', '_' ) )
-              json = JSON.parse( curl( "https://#{lang}.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&format=json&formatversion=2&utf8=&pageids=#{page_id}") )
-              record['create_ts'] = json['query']['pages'][0]['revisions'][0]['timestamp']
-              record['summary'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/summary/#{cgi_title}" ) )
-              record['media'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/media/#{cgi_title}" ) )
-              record['related'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/related/#{cgi_title}" ) )
-              fout.puts JSON.generate( record )
-              was_page_ids.add( page_id )
+          if !$geoflag || geoset.include?( page_id ) then
+            if page_id % $divider == $rest then
+              if !was_page_ids.include?( page_id ) then
+                record = { 'page_id' => page_id, 'download_ts' => DateTime.now.to_s }
+                cgi_title = CGI::escape( page_title.gsub( ' ', '_' ) )
+                json = JSON.parse( curl( "https://#{lang}.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&format=json&formatversion=2&utf8=&pageids=#{page_id}") )
+                record['create_ts'] = json['query']['pages'][0]['revisions'][0]['timestamp']
+                record['summary'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/summary/#{cgi_title}" ) )
+                record['media'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/media/#{cgi_title}" ) )
+                record['related'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/related/#{cgi_title}" ) )
+                fout.puts JSON.generate( record )
+                was_page_ids.add( page_id )
+              end
             end
           end
         end
@@ -61,8 +63,17 @@ def process_language_inner( db_fpath, articles_fpath, lang, was_page_ids )
   end
 end
 
-def process_language( db_fpath, articles_fpath, lang )
+def process_language( db_fpath, articles_fpath, lang, geo_fpath )
   was_page_ids = Set.new
+  geoset = Set.new
+  if $geoflag then
+    Zlib::GzipReader.open( geo_fpath ) do |gz|
+      while line = gz.gets do
+        page_id, rest = line.split( /\t/, 2 )
+        geoset.add( page_id.to_i )
+      end
+    end
+  end
   if File.exist?( db_fpath ) then
     File.open(db_fpath).each do |line|
       begin
@@ -77,7 +88,7 @@ def process_language( db_fpath, articles_fpath, lang )
     end
   end
   while true do
-    process_language_inner( db_fpath, articles_fpath, lang, was_page_ids )
+    process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset )
     was_page_ids = Set.new
     puts "#{lang} NEW LOOP"
   end
@@ -85,6 +96,8 @@ end
 
 $data_dir = ENV['DATA_DIR'] || '/db'
 if !$data_dir || !File.directory?( $data_dir ) then raise "Set DATA_DIR environment variable" end
+
+$geoflag = true # uwzględniamy tylko te page_id, które dotyczą miejsc w terenie
 
 $divider = 1
 $rest = 0
@@ -107,9 +120,10 @@ Dir["#{dumps_dir}/*"].each do |dump_lc_dir|
     FileUtils.mkdir_p( db_dir )
     db_fpath = File.join( db_dir, "#{lang}.json" )
     articles_fpath = File.join( dump_dir, 'articles.tsv.gz' )
+    geo_fpath = File.join( dump_dir, 'geo_tags.tsv.gz' )
     if File.exist?( articles_fpath ) then
       STDOUT.puts( "Processing #{lang}..." )
-      thread = Thread.new{ process_language( db_fpath, articles_fpath, lang ) }
+      thread = Thread.new{ process_language( db_fpath, articles_fpath, lang, geo_fpath ) }
       threads.push( thread )
     end
   end
