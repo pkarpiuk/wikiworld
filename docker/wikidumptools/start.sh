@@ -34,6 +34,10 @@ case $1 in
     shift
     exec ./main extra-download "$@"
     ;;
+  "events")
+    shift
+    exec ./main events "$@"
+    ;;
   "switch")
     shift
     # ./tester.rb "$@"
