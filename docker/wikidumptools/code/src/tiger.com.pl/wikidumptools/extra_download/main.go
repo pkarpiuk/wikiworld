@@ -31,6 +31,7 @@ var DumpsDir string
 var DBDir string
 var WaitGroup sync.WaitGroup
 var GeoFlag bool = true // TODO: potem ustawić na false
+var ThrottlingDelayMs int = 1000
 
 func innerCountRecords( r io.Reader, result map[int64]int, negativeFlag bool ) {
   scanner := bufio.NewScanner(r)
@@ -86,6 +87,7 @@ func loadGeoSet( geoFPath string ) (result map[int64]bool) {
 }
 
 func innerDownload( url string ) (result map[string]interface{}) {
+  time.Sleep(time.Duration(ThrottlingDelayMs) * time.Millisecond)
   resp, err := http.Get(url)
   if err != nil {
     fmt.Fprintf( os.Stderr, "ERROR[5]: %v\n", err )
@@ -93,16 +95,16 @@ func innerDownload( url string ) (result map[string]interface{}) {
   }
   defer resp.Body.Close()
 
-responseData,err := ioutil.ReadAll(resp.Body)
-if err != nil {
+  str,err := ioutil.ReadAll(resp.Body)
+  if err != nil {
     panic(err)
-}
-err = json.Unmarshal( []byte(responseData), &result )
+  }
+  err = json.Unmarshal( []byte(str), &result )
 
   // err = json.NewDecoder(resp.Body).Decode(&result)
 
   if err != nil {
-    fmt.Fprintf( os.Stderr, "ERROR[6]: %v; %s\n  %s\n", err, url, responseData )
+    fmt.Fprintf( os.Stderr, "ERROR[6]: %v; %s\n  %s\n", err, url, str )
     return nil
   }
   return
@@ -325,6 +327,9 @@ func processLanguage( dbFPath string, articlesFPath string, lang string, geoFPat
 }
 
 func Main( args []string ) bool {
+  if os.Getenv( "THROTTLING_DELAY" ) != "" {
+    ThrottlingDelayMs = utils.Atoi( os.Getenv( "THROTTLING_DELAY" ) )
+  }
   if len(args) == 3 {
     TheDivider = int64(utils.Atoi( args[1] ))
     TheRest = int64(utils.Atoi( args[2] ))
