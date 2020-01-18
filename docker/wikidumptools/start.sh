@@ -30,8 +30,8 @@ case $1 in
   "hourly")
     exec ./worker.rb hourly
     ;;
-  "extra")
-    exec ./rest-downloader.rb "$@"
+  "rest")
+    exec ./main extra-download "$@"
     ;;
   "switch")
     shift
