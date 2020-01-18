@@ -28,10 +28,10 @@
 cd wikiworld/docker/wikidumptools
 docker build --no-cache=true -t wikidumptools .
 export DATA_DIR=/mnt/arch/wiki-data
-docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
-docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db wikidumptools hourly
-docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db wikidumptools rest
-docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidumptools events</pre>
+docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
+docker run --restart=unless-stopped -v ${DATA_DIR}:/db wikidumptools hourly
+docker run --restart=unless-stopped -v ${DATA_DIR}:/db wikidumptools rest
+docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidumptools events</pre>
         <p style="color: red"><b>Uwaga</b>: Nigdy nie należy uruchamiać więcej niż jednej instancji narzędzia z tymi samymi parametrami (np. dwóch instancji 'wikidumps daily'). Efektem będzie kaszanka w systemie plików, potencjalnie nieodwracalna.</p>
         <h2>Zmienne środowiskowe</h2>
         <p>Musi być zdefiniowana i niepusta przynajmniej jedna z dwóch zmiennych: <code>WIKIPEDIA_LANGUAGES</code> lub <code>WIKIQUOTE_LANGUAGES</code>.</p>
