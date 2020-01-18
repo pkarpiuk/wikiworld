@@ -93,6 +93,7 @@ def process_language( db_fpath, articles_fpath, lang, geo_fpath )
     process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset )
     was_page_ids = Set.new
     puts "#{lang} NEW LOOP"
+    break # TODO: usunąć
   end
 end
 
