@@ -54,10 +54,10 @@
 cd wikiworld/docker/wikidumptools
 docker build --no-cache=true -t wikidumptools .
 export DATA_DIR=/mnt/arch/wiki-data
-docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
-docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db wikidumptools hourly
-docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db wikidumptools rest
-docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidumptools events</pre>
+docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e WIKIPEDIA_LANGUAGES='pl en' wikidumptools daily
+docker run --restart=unless-stopped -v ${DATA_DIR}:/db wikidumptools hourly
+docker run --restart=unless-stopped -v ${DATA_DIR}:/db wikidumptools rest
+docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidumptools events</pre>
         <p style="color: red"><b>Uwaga</b>: Nigdy nie należy uruchamiać więcej niż jednej instancji narzędzia z tymi samymi parametrami (np. dwóch instancji 'wikidumps daily'). Efektem będzie kaszanka w systemie plików, potencjalnie nieodwracalna.</p>
         <a name="Zmienne%20%C5%9Brodowiskowe"></a><h2>3. Zmienne środowiskowe</h2>
         <p>Musi być zdefiniowana i niepusta przynajmniej jedna z dwóch zmiennych: <code>WIKIPEDIA_LANGUAGES</code> lub <code>WIKIQUOTE_LANGUAGES</code>.</p>
@@ -74,6 +74,8 @@ docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wi
 <dd>(daily) Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
           <dt>EVENTS_DAYS</dt>
 <dd>(events) Z ilu ostatnich dni przechowywać zdarzenia modyfikacji/tworzenia artykułów. Domyślnie 64, 0 oznacza wszystkie</dd>
+          <dt>THROTTLING_DELAY</dt>
+<dd>(rest) Ile ms każdy wątek ma czekać między kolejnym wykonaniem Wikipedia API. Domyślnie 1000</dd>
         </dl>
         <a name="Ukryte%20zmienne"></a><h2>4. Ukryte zmienne</h2>
         <p><code>SupportedWikiLangs</code> to lista wersji językowych Wikipedii dla których narzędzie Wikidumptools ma najlepsze wsparcie. Są to wersje:</p>
@@ -147,9 +149,12 @@ docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wi
   db/                      # trudno się odtwarza
     wikipedia/
       articles/
-        pl.json
+        pl.json            # plik roboczy (cache)
         en.json
         ...
+        snapshots/         # snapshoty
+          pl.json.gz
+          en.json.gz
     wikiquote/
     events/
       raw/                 # zdarzenia tworzenia i modyfikacji artykułów
@@ -877,7 +882,7 @@ docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wi
         <a name="DB"></a><h2>10. DB</h2>
         <p>W katalogu <code><i>DATA_DIR</i>/db</code> przechowywane są takie dane, które trudno odtworzyć, więc zasadniczo nie powinno się tego katalogu usuwać, a przy przenoszeniu całej infrastruktury na inną maszynę warto go spakować i odtworzyć na nowej lokalizacji.</p>
         <a name="Rest"></a><h3>10.1. Rest</h3>
-        <p>W udostępnianych publicznie plikach dumpów pewne ciekawe dane są trudno dostępne lub wręcz niedostępne. Dla każdej wersji językowej Wikipedii w pliku <code><i>DATA_DIR</i>/db/wikipedia/articles/<i>lang</i>.json</code> przechowujemy ściągnięte przez API Wikipedii rekordy o poszczególnych artykułach:</p>
+        <p>W udostępnianych publicznie plikach dumpów pewne ciekawe dane są trudno dostępne lub wręcz niedostępne. Dla każdej wersji językowej Wikipedii w pliku <code><i>DATA_DIR</i>/db/wikipedia/articles/snapshots/<i>lang</i>.json.gz</code> przechowujemy tzw. rest snapshot, tj. ściągnięte przez API Wikipedii rekordy o wszystkich artykułach danej wersji językowej Wikipedii:</p>
         <ul>
           <li>
 <code>page_id</code>: (int) identyfikator artykułu
@@ -898,7 +903,7 @@ docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wi
 <code>related</code>: (array of number) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/related/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>) i przycięty do samych identyfikatorów artykułów
         </li>
 </ul>
-        <p>Narzędzie 'wikidumptools rest' chodzi w kółko i uzupełnia pliki. Dba żeby dane były zawsze aktualne (np. o obrazkach), można założyć że podmiana pliku odbywa się w sposób atomowy. Plik co pewien czas jest automatycznie kompresowany (można założyć że w sposób atomowy), ale zasadniczo w pliku może być wiele rekordów z danym page_id, najświeższy jest rekord ostatni.</p>
+        <p>Narzędzie 'wikidumptools rest' chodzi w kółko i uzupełnia pliki cache w <code><i>DATA_DIR</i>/db/wikipedia/articles/<i>lang</i>.json</code>, a po wykonaniu każdego cyklu dla wszystkich artykułów w danej wersji językowej robi snapshota. W ten sposób snapshoty są sukcesywnie aktualizowane (podmiana pliku snapshota odbywa się w sposób atomowy).</p>
         <p>Przykład rekordu:</p>
         <pre>{
   "page_id": 30,

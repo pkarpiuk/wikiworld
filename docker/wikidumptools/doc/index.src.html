@@ -42,6 +42,7 @@ docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidum
           <dt>PAGEVIEW_DAYS</dt><dd>(daily) Ile ostatnich plików dziennych pageview ściągnąć. Domyślnie 64, 0 oznacza wszystkie, &lt;0 oznacza nie ściągać w ogóle</dd>
           <dt>CLICKSTREAM_MONTHS</dt><dd>(daily) Ile ostatnich plików miesięcznych clickstream ściągnąć. Domyślnie 0 (czyli wszystkie), &lt;0 oznacza nie ściągać w ogóle</dd>
           <dt>EVENTS_DAYS</dt><dd>(events) Z ilu ostatnich dni przechowywać zdarzenia modyfikacji/tworzenia artykułów. Domyślnie 64, 0 oznacza wszystkie</dd>
+          <dt>THROTTLING_DELAY</dt><dd>(rest) Ile ms każdy wątek ma czekać między kolejnym wykonaniem Wikipedia API. Domyślnie 1000</dd>
         </dl>
         <h2>Ukryte zmienne</h2>
         <p><code>SupportedWikiLangs</code> to lista wersji językowych Wikipedii dla których narzędzie Wikidumptools ma najlepsze wsparcie. Są to wersje:</p>
@@ -105,10 +106,10 @@ docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidum
   db/                      # trudno się odtwarza
     wikipedia/
       articles/
-        pl.json            # plik roboczy
+        pl.json            # plik roboczy (cache)
         en.json
         ...
-        snapshots/         # snapshoty do dalszego przetwarzania
+        snapshots/         # snapshoty
           pl.json.gz
           en.json.gz
     wikiquote/
@@ -579,7 +580,7 @@ docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidum
         <h2>DB</h2>
         <p>W katalogu <code><i>DATA_DIR</i>/db</code> przechowywane są takie dane, które trudno odtworzyć, więc zasadniczo nie powinno się tego katalogu usuwać, a przy przenoszeniu całej infrastruktury na inną maszynę warto go spakować i odtworzyć na nowej lokalizacji.</p>
         <h3>Rest</h3>
-        <p>W udostępnianych publicznie plikach dumpów pewne ciekawe dane są trudno dostępne lub wręcz niedostępne. Dla każdej wersji językowej Wikipedii w pliku <code><i>DATA_DIR</i>/db/wikipedia/articles/<i>lang</i>.json</code> przechowujemy ściągnięte przez API Wikipedii rekordy o poszczególnych artykułach:</p>
+        <p>W udostępnianych publicznie plikach dumpów pewne ciekawe dane są trudno dostępne lub wręcz niedostępne. Dla każdej wersji językowej Wikipedii w pliku <code><i>DATA_DIR</i>/db/wikipedia/articles/snapshots/<i>lang</i>.json.gz</code> przechowujemy tzw. rest snapshot, tj. ściągnięte przez API Wikipedii rekordy o wszystkich artykułach danej wersji językowej Wikipedii:</p>
         <ul>
           <li><code>page_id</code>: (int) identyfikator artykułu
           <li><code>download_ts</code>: (string) data utworzenia rekordu (ściągnięcia danych z Internetu), w formacie. "2020-01-17T15:36:42+01:00"
@@ -588,7 +589,7 @@ docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidum
           <li><code>media</code>: (JSON) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/media/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>)
           <li><code>related</code>: (array of number) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/related/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>) i przycięty do samych identyfikatorów artykułów
         </ul>
-        <p>Narzędzie 'wikidumptools rest' chodzi w kółko i uzupełnia pliki. Dba żeby dane były zawsze aktualne (np. o obrazkach), można założyć że podmiana pliku odbywa się w sposób atomowy. Plik co pewien czas jest automatycznie kompresowany (można założyć że w sposób atomowy), ale zasadniczo w pliku może być wiele rekordów z danym page_id, najświeższy jest rekord ostatni.</p>
+        <p>Narzędzie 'wikidumptools rest' chodzi w kółko i uzupełnia pliki cache w <code><i>DATA_DIR</i>/db/wikipedia/articles/<i>lang</i>.json</code>, a po wykonaniu każdego cyklu dla wszystkich artykułów w danej wersji językowej robi snapshota. W ten sposób snapshoty są sukcesywnie aktualizowane (podmiana pliku snapshota odbywa się w sposób atomowy).</p>
         <p>Przykład rekordu:</p>
         <pre>{
   "page_id": 30,

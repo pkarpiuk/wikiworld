@@ -17,6 +17,7 @@ import clickstream "tiger.com.pl/wikidumptools/clickstream"
 import monitor "tiger.com.pl/wikidumptools/monitor"
 import createts "tiger.com.pl/wikidumptools/createts"
 import extra_download "tiger.com.pl/wikidumptools/extra_download"
+import events "tiger.com.pl/wikidumptools/events"
 
 func usage() {
   fmt.Fprintf( os.Stderr, "Parametry wywołania:\n" )
@@ -158,6 +159,8 @@ func main() {
     res = createts.Main( os.Args )
   } else if cmd == "extra-download" {
     res = extra_download.Main( os.Args )
+  } else if cmd == "events" {
+    res = events.Main( os.Args )
   }
   if !res {
     usage()
