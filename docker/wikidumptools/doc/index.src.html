@@ -583,7 +583,7 @@ docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wi
           <li><code>create_ts</code>: (string) data utworzenia pierwszej rewizji artykułu, w formacie. "2002-07-27T00:34:39Z" (<a href="https://www.mediawiki.org/wiki/API:Revisions">Wikipedia API DOC</a>)
           <li><code>summary</code>: (JSON) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/summary/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>)
           <li><code>media</code>: (JSON) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/media/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>)
-          <li><code>related</code>: (JSON) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/related/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>)
+          <li><code>related</code>: (array of number) wynik ściągnięty z <code>https://<i>lang</i>.wikipedia.org/api/rest_v1/page/related/<i>tytuł_artykułu</i></code> (<a href="https://pl.wikipedia.org/api/rest_v1/#/Page%20content">Wikipedia API DOC</a>) i przycięty do samych identyfikatorów artykułów
         </ul>
         <p>Narzędzie 'wikidumptools rest' chodzi w kółko i uzupełnia pliki. Dba żeby dane były zawsze aktualne (np. o obrazkach), można założyć że podmiana pliku odbywa się w sposób atomowy. Plik co pewien czas jest automatycznie kompresowany (można założyć że w sposób atomowy), ale zasadniczo w pliku może być wiele rekordów z danym page_id, najświeższy jest rekord ostatni.</p>
         <p>Przykład rekordu:</p>
@@ -658,30 +658,12 @@ docker run --restart=unless-stopped --rm -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wi
           "mime": "image/jpeg"
         },
         "file_page": "https://commons.wikimedia.org/wiki/File:Agulhas.jpg",
-        "license": {
-          "type": "CC BY-SA 2.0",
-          "code": "cc-by-sa-2.0",
-          "url": "https://creativecommons.org/licenses/by-sa/2.0"
-        },
-        "artist": {
-          "html": ...
-          "text": "File:South Africa location map.svg by NordNordWest\n\nderivative work by Htonl"
-        },
-        "credit": {
-          "html": ...
-          "text": "File:South Africa location map.svg\nSRTM\nETOPO1"
-        },
-        "wb_entity_id": "M45107",
+        "wb_entity_id": "M45107"
       },
       ...
     ],
   ...
-  "related": {
-    "pages": [
-      {
-        <i>format taki sam jak w polu "summary"</i>
-      },
-     ...
+  "related": [734837,123892,123213,39383,905044,49043]
   ]
 }</pre>
         <h3>Events</h3>
