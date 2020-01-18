@@ -101,7 +101,7 @@ func innerDownload( url string ) (result map[string]interface{}) {
 }
 
 func downloadJSON( url string ) (result map[string]interface{}) {
-  // fmt.Fprintf( os.Stdout, "%s\n", url )
+  fmt.Fprintf( os.Stdout, "%s\n", url )
   counter := 0
   for {
     counter += 1
