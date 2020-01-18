@@ -58,7 +58,8 @@ def process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset
                   obj.delete( 'credit' )
                   obj.delete( 'license' )
                 end
-                record['related'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/related/#{cgi_title}" ) )['pages'].map{|rec| rec['pageid']}
+                related = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/related/#{cgi_title}" ) )['pages'] || []
+                record['related'] = related.map{|rec| rec['pageid']}
                 fout.puts JSON.generate( record )
                 was_page_ids.add( page_id )
               end
@@ -77,8 +78,9 @@ def process_language( db_fpath, articles_fpath, lang, geo_fpath )
     Zlib::GzipReader.open( geo_fpath ) do |gz|
       while line = gz.gets do
         page_id, lat, lon, globe, primary, rest = line.split( /\t/, 6 )
-        if primary == '1' then
-          geoset.add( page_id.to_i )
+        page_id = page_id.to_i
+        if (primary == '1') && (page_id % $divider == $rest) then
+          geoset.add( page_id )
         end
       end
     end
@@ -97,7 +99,12 @@ def process_language( db_fpath, articles_fpath, lang, geo_fpath )
     end
   end
   while true do
-    process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset )
+    begin
+      process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset )
+    rescue Exception => ex
+      STDERR.puts ex
+      exit 1
+    end
     was_page_ids = Set.new
     puts "#{lang} NEW LOOP"
     break # TODO: usunąć
