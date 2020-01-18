@@ -13,7 +13,7 @@ import "strconv"
 import "path"
 import _ "github.com/mattn/go-sqlite3"
 
-var SupportedLanguages map[string]bool = map[string]bool { "en": true, "de": true, "fr": true, "ru": true, "it": true, "es": true, "pl": true, "pt": true, "ja": true }
+var SupportedLanguages map[string]bool = map[string]bool { "en": true, "de": true, "fr": true, "ru": true, "it": true, "es": true, "pl": true, "pt": true, "ja": true, "zh": true, "fa": true }
 
 type ProcessFun func( map[string]string )
 

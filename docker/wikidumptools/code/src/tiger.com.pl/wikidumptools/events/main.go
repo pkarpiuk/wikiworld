@@ -1,10 +1,13 @@
 package events
 
+import "io/ioutil"
+import "sort"
 import "encoding/json"
 import "fmt"
 import "time"
 import "path"
 import "os"
+import "strings"
 import sse "github.com/r3labs/sse"
 import utils "tiger.com.pl/wikidumptools/utils"
 
@@ -42,7 +45,36 @@ func getInt64(val interface{}) int64 {
   }
 }
 
+func removeLastFiles( maxCount int ) {
+  dir := path.Join( utils.DataDir, "db", "events", "raw" )
+  files_list, err := ioutil.ReadDir( dir )
+  if err != nil {
+    panic( err )
+  }
+  arr := make([]string,0)
+  for _, fi := range files_list {
+    if strings.HasSuffix( fi.Name(), ".json" ) {
+      arr = append( arr, fi.Name() )
+    }
+  }
+  sort.Slice( arr, func( i, j int ) bool {
+    return arr[i] >= arr[j]
+  })
+  if maxCount < len(arr) {
+    arr = arr[maxCount:]
+    for _, fname := range arr {
+      os.Remove( path.Join( dir, fname ) )
+    }
+  }
+}
+
 func Main( args []string ) bool {
+  eventsDaysCount := 64
+  if os.Getenv( "EVENTS_DAYS" ) != "" {
+    eventsDaysCount = utils.Atoi( os.Getenv( "EVENTS_DAYS" ) )
+  }
+  removeLastFiles( eventsDaysCount )
+
   startTime := time.Now().UTC().Format( "2006-01-02" )
   outFPath := path.Join( utils.DataDir, "db", "events", "raw", startTime + ".json" )
   f, err := os.OpenFile( outFPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644 )
