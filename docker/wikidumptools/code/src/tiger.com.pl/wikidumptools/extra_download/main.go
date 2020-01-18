@@ -102,7 +102,7 @@ err = json.Unmarshal( []byte(responseData), &result )
   // err = json.NewDecoder(resp.Body).Decode(&result)
 
   if err != nil {
-    fmt.Fprintf( os.Stderr, "ERROR[6]: %v; %s\n  \n", err, url, responseData )
+    fmt.Fprintf( os.Stderr, "ERROR[6]: %v; %s\n  %s\n", err, url, responseData )
     return nil
   }
   return
