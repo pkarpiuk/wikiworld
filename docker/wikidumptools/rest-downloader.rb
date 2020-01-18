@@ -50,8 +50,15 @@ def process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset
                 json = JSON.parse( curl( "https://#{lang}.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&format=json&formatversion=2&utf8=&pageids=#{page_id}") )
                 record['create_ts'] = json['query']['pages'][0]['revisions'][0]['timestamp']
                 record['summary'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/summary/#{cgi_title}" ) )
+                record['summary'].delete( 'content_urls' )
+                record['summary'].delete( 'api_urls' )
                 record['media'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/media/#{cgi_title}" ) )
-                record['related'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/related/#{cgi_title}" ) )
+                record['media']['items'].each do |obj|
+                  obj.delete( 'artist' )
+                  obj.delete( 'credit' )
+                  obj.delete( 'license' )
+                end
+                record['related'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/related/#{cgi_title}" ) )['pages'].map{|rec| rec['pageid']}
                 fout.puts JSON.generate( record )
                 was_page_ids.add( page_id )
               end
