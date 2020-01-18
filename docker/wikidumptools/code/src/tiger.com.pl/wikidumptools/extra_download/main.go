@@ -136,7 +136,7 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       record := Record {
         PageId: pid,
         DownloadTs: time.Now().Format("2006-01-02T15:04:05-07:00") }
-      cgiTitle := url.QueryEscape( strings.ReplaceAll( pageTitle, " ", "_" ) )
+      cgiTitle := url.QueryEscape( strings.Replace( pageTitle, " ", "_", -1 ) )
 
       js := downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&format=json&formatversion=2&utf8=&pageids=%d", lang, pid ) )
       if js != nil && js["query"] != nil {
