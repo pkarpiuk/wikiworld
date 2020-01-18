@@ -16,6 +16,15 @@ import "compress/gzip"
 import "io"
 import utils "tiger.com.pl/wikidumptools/utils"
 
+type Record struct {
+  PageId int64        `json:"page_id"`
+  DownloadTs string   `json:"download_ts"`
+  CreateTs string     `json:"create_ts,omitempty"`
+  Summary interface{} `json:"summary,omitempty"`
+  Media interface{}   `json:"media,omitempty"`
+  Related []int64     `json:"related,omitempty"`
+}
+
 var TheDivider int64 = 1
 var TheRest int64 = 0
 var DumpsDir string
@@ -76,15 +85,6 @@ func loadGeoSet( geoFPath string ) (result map[int64]bool) {
   return
 }
 
-type Record struct {
-  PageId int64        `json:"page_id"`
-  DownloadTs string   `json:"download_ts"`
-  CreateTs string     `json:"create_ts,omitempty"`
-  Summary interface{} `json:"summary,omitempty"`
-  Media interface{}   `json:"media,omitempty"`
-  Related []int64     `json:"related,omitempty"`
-}
-
 func innerDownload( url string ) (result map[string]interface{}) {
   resp, err := http.Get(url)
   if err != nil {
@@ -139,7 +139,7 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       cgiTitle := url.QueryEscape( pageTitle )
 
       js := downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&format=json&formatversion=2&utf8=&pageids=%d", lang, pid ) )
-      if js != nil {
+      if js != nil && js["query"] != nil {
         query := js["query"].(map[string]interface{})
         if query != nil {
           pages := query["pages"].([]interface{})
@@ -166,7 +166,7 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       }
 
       js = downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/api/rest_v1/page/media/%s", lang, cgiTitle ) )
-      if js != nil {
+      if js != nil && js["items"] != nil {
         items := js["items"].([]interface{})
         if items != nil {
           for _, item := range items {
@@ -180,7 +180,7 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       }
 
       js = downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/api/rest_v1/page/related/%s", lang, cgiTitle ) )
-      if js != nil {
+      if js != nil && js["pages"] != nil {
         pages := js["pages"].([]interface{})
         if pages != nil {
           record.Related = make([]int64,0,len(pages))
