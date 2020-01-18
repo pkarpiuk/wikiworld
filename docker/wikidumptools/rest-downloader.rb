@@ -32,7 +32,7 @@ end
 
 def process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset )
   line_counter = 0
-  open( db_fpath, 'w') do |fout|
+  open( db_fpath, 'a') do |fout|
     Zlib::GzipReader.open( articles_fpath ) do |gz|
       while line = gz.gets do
         page_id, page_title, rest = line.split( /\t/, 3 )
