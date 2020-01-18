@@ -141,11 +141,11 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       js := downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&format=json&formatversion=2&utf8=&pageids=%d", lang, pid ) )
       if js != nil && js["query"] != nil {
         query := js["query"].(map[string]interface{})
-        if query != nil {
+        if query != nil && query["pages"] != nil {
           pages := query["pages"].([]interface{})
           if pages != nil && len(pages) > 0 {
             page := pages[0].(map[string]interface{})
-            if page != nil {
+            if page != nil && page["revisions"] != nil {
               revisions := page["revisions"].([]interface{})
               if revisions != nil && len(revisions) > 0 {
                 revision := revisions[0].(map[string]interface{})
@@ -298,6 +298,7 @@ func processLanguage( dbFPath string, articlesFPath string, lang string, geoFPat
     fmt.Fprintf( os.Stdout, "%s: geo %d\n", lang, len(geoSet) )
   }
   fmt.Fprintf( os.Stdout, "%s: was processed %d\n", lang, len(wasPageIds) )
+  // W pierwszym uruchomieniu processLanguageInner dociągamy tylko te artykuły, których nie ma w ostatnim snapshocie i dbFPath
   processLanguageInner( dbFPath, articlesFPath, lang, wasPageIds, geoSet ) // w wasPageIds bedzie >0 dla artykulow spoza snapshota: tych co byly juz w dbFPath lub nowo sciagnietych
   newRecordsCount := 0
   for _, val := range wasPageIds {
