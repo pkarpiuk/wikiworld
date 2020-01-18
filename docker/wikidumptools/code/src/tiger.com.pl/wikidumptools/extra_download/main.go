@@ -57,6 +57,7 @@ func innerCountRecords( r io.Reader, result map[int64]int, negativeFlag bool ) {
 }
 
 func countRecords( dbFPath string ) (result map[int64]int) {
+  result = make(map[int64]int)
   file, err := os.Open( dbFPath )
   if os.IsNotExist( err ) {
     return
@@ -65,7 +66,6 @@ func countRecords( dbFPath string ) (result map[int64]int) {
     panic(err)
   }
   defer file.Close()
-  result = make(map[int64]int)
   innerCountRecords( file, result, false )
   return
 }
