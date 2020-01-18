@@ -31,6 +31,7 @@ case $1 in
     exec ./worker.rb hourly
     ;;
   "rest")
+    shift
     exec ./main extra-download "$@"
     ;;
   "switch")
