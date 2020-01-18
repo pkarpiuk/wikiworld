@@ -7,6 +7,6 @@ mkdir -p ${DATA_DIR}/cache/dumps/{wikipedia,wikiquote}
 mkdir -p ${DATA_DIR}/cache/clickstream
 mkdir -p ${DATA_DIR}/public/{wikipedia,wikiquote}
 mkdir -p ${DATA_DIR}/logs
-mkdir -p ${DATA_DIR}/db/{wikipedia,wikiquote}/articles
+mkdir -p ${DATA_DIR}/db/{wikipedia,wikiquote}/articles/snapshots
 mkdir -p ${DATA_DIR}/db/events/{raw,stats}
 

@@ -16,6 +16,7 @@ import geomap "tiger.com.pl/wikidumptools/geomap"
 import clickstream "tiger.com.pl/wikidumptools/clickstream"
 import monitor "tiger.com.pl/wikidumptools/monitor"
 import createts "tiger.com.pl/wikidumptools/createts"
+import extra_download "tiger.com.pl/wikidumptools/extra_download"
 
 func usage() {
   fmt.Fprintf( os.Stderr, "Parametry wywołania:\n" )
@@ -155,6 +156,8 @@ func main() {
     res = monitor.Main( os.Args )
   } else if cmd == "createts" {
     res = createts.Main( os.Args )
+  } else if cmd == "extra-download" {
+    res = extra_download.Main( os.Args )
   }
   if !res {
     usage()

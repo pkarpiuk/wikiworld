@@ -348,8 +348,12 @@ func init() {
   mkDir( path.Join( DataDir, "cache", "dumps", "wikipedia" ) )
   mkDir( path.Join( DataDir, "cache", "dumps", "wikiquote" ) )
   mkDir( path.Join( DataDir, "cache", "clickstream" ) )
-  mkDir( path.Join( DataDir, "public" ) )
+  mkDir( path.Join( DataDir, "public", "wikipedia" ) )
+  mkDir( path.Join( DataDir, "public", "wikiquote" ) )
   mkDir( path.Join( DataDir, "logs" ) )
-  mkDir( path.Join( DataDir, "db" ) )
+  mkDir( path.Join( DataDir, "db", "wikipedia", "articles", "snapshots" ) )
+  mkDir( path.Join( DataDir, "db", "wikiquote", "articles", "snapshots" ) )
+  mkDir( path.Join( DataDir, "db", "events", "raw" ) )
+  mkDir( path.Join( DataDir, "db", "events", "stats" ) )
 }
 

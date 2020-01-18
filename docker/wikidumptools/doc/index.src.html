@@ -105,9 +105,12 @@ docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidum
   db/                      # trudno się odtwarza
     wikipedia/
       articles/
-        pl.json
+        pl.json            # plik roboczy
         en.json
         ...
+        snapshots/         # snapshoty do dalszego przetwarzania
+          pl.json.gz
+          en.json.gz
     wikiquote/
     events/
       raw/                 # zdarzenia tworzenia i modyfikacji artykułów
