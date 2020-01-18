@@ -94,14 +94,14 @@ func innerDownload( url string ) (result map[string]interface{}) {
   defer resp.Body.Close()
   err = json.NewDecoder(resp.Body).Decode(&result)
   if err != nil {
-    fmt.Fprintf( os.Stderr, "ERROR[6]: %v\n", err )
+    fmt.Fprintf( os.Stderr, "ERROR[6]: %v; %s\n", err, url )
     return nil
   }
   return
 }
 
 func downloadJSON( url string ) (result map[string]interface{}) {
-  fmt.Fprintf( os.Stdout, "%s\n", url )
+  // fmt.Fprintf( os.Stdout, "%s\n", url )
   counter := 0
   for {
     counter += 1
