@@ -53,13 +53,13 @@ def process_language_inner( db_fpath, articles_fpath, lang, was_page_ids, geoset
                 record['summary'].delete( 'content_urls' )
                 record['summary'].delete( 'api_urls' )
                 record['media'] = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/media/#{cgi_title}" ) )
-                record['media']['items'].each do |obj|
+                (record['media']['items'] || []).each do |obj|
                   obj.delete( 'artist' )
                   obj.delete( 'credit' )
                   obj.delete( 'license' )
                 end
                 related = JSON.parse( curl( "https://#{lang}.wikipedia.org/api/rest_v1/page/related/#{cgi_title}" ) )['pages'] || []
-                record['related'] = related.map{|rec| rec['pageid']}
+                record['related'] = related.select{|rec| rec['ns'] == 0}.map{|rec| rec['pageid']}
                 fout.puts JSON.generate( record )
                 was_page_ids.add( page_id )
               end
