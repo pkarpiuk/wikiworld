@@ -149,6 +149,16 @@ def check_environment
   end
 end
 
+def download_pageview_days( logs_dir )
+  if $PAGEVIEW_DAYS >= 0 then
+    puts "Downloading daily pageviews"
+    days_log_fpath = File.join( logs_dir, 'pageview-days-logs.txt' )
+    return docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download pageview-days #{$PAGEVIEW_DAYS} >> '#{days_log_fpath}' 2>&1" )
+  else
+    return ['', 0]
+  end
+end
+
 def daily_main()
   logs_dir = File.join( $DATA_DIR, 'logs' )
   if $PAGEVIEW_MONTHS >= 0 then
@@ -166,20 +176,20 @@ def daily_main()
   # Zaciągamy najnowsze dumpy (extract+cathier full)
   json = get_last_dump_dates( $WIKIPEDIA_LANGUAGES.map{|lc| lc+'wiki'}.concat($WIKIQUOTE_LANGUAGES.map{|lc| lc+'wikiquote'}).to_set )
   $WIKIPEDIA_LANGUAGES.each do |lc|
+    start_ts = Time.now
     extract_and_cathier( json, lc, 'wiki', 'wikipedia' )
+    if Time.now - start_ts >= 3600 then download_pageview_days( logs_dir ) end
   end
   $WIKIQUOTE_LANGUAGES.each do |lc|
+    start_ts = Time.now
     extract_and_cathier( json, lc, 'wikiquote', 'wikiquote' )
+    if Time.now - start_ts >= 3600 then download_pageview_days( logs_dir ) end
   end
   # Usuwamy stare dumpy
   puts "Removing old dumps"
   result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download remove-old-dumps 2>&1" )
   puts result
-  if $PAGEVIEW_DAYS >= 0 then
-    puts "Downloading daily pageviews"
-    days_log_fpath = File.join( logs_dir, 'pageview-days-logs.txt' )
-    result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download pageview-days #{$PAGEVIEW_DAYS} >> '#{days_log_fpath}' 2>&1" )
-  end
+  download_pageview_days( logs_dir )
   result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download data-dir-info > #{File.join($DATA_DIR, 'public', 'downloader-stats.txt')} 2>&1" )
 end
 
