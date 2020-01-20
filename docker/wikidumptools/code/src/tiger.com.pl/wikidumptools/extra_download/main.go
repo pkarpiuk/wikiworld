@@ -57,7 +57,7 @@ func innerCountRecords( r io.Reader, result map[int64]int, negativeFlag bool ) {
   }
 }
 
-func countRecords( dbFPath string ) (result map[int64]int) {
+func countRecords( dbFPath string, result map[int64]int ) {
   result = make(map[int64]int)
   file, err := os.Open( dbFPath )
   if os.IsNotExist( err ) {
@@ -68,7 +68,6 @@ func countRecords( dbFPath string ) (result map[int64]int) {
   }
   defer file.Close()
   innerCountRecords( file, result, false )
-  return
 }
 
 func loadGeoSet( geoFPath string ) (result map[int64]bool) {
@@ -221,7 +220,9 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
 
 func makeSnapshot( lang string ) {
   dbFPath := path.Join( DBDir, lang + ".json" )
-  wasPageIds := countRecords( dbFPath )
+  wasPageIds := make(map[int64]int)
+  supplementHash( lang, wasPageIds, false )
+  countRecords( dbFPath, wasPageIds )
   if len(wasPageIds) > 0 {
     snapshotsDir := path.Join( DBDir, "snapshots" )
     snapshotFPath := path.Join( snapshotsDir, lang + ".json.gz" )
@@ -231,6 +232,47 @@ func makeSnapshot( lang string ) {
     }
     os.Chmod( tmpFile.Name(), 0776)
     w := gzip.NewWriter(tmpFile)
+
+    _, err = os.Stat( snapshotFPath )
+    if !os.IsNotExist( err ) {
+      if err != nil {
+        panic(err)
+      }
+      sfile, err := os.Open( snapshotFPath )
+      if err != nil {
+        panic( err )
+      }
+      gz, err := gzip.NewReader(sfile)
+      if err != nil {
+        panic( err )
+      }
+      scanner := bufio.NewScanner(gz)
+      buf := make([]byte, 0, 10*1024*1024)
+      scanner.Buffer(buf, 10*1024*1024)
+      var rec map[string]interface{}
+      for scanner.Scan() {
+        err := json.Unmarshal(scanner.Bytes(), &rec)
+        if err == nil {
+          pid := int64(rec["page_id"].(float64))
+          wasPageIds[pid] -= 1
+          if wasPageIds[pid] == 0 {
+            data, err := json.Marshal(rec)
+            if err != nil {
+              panic( err )
+            }
+            _, err = fmt.Fprintln(w, string(data))
+            if err != nil {
+              panic( err )
+            }
+          }
+        }
+      }
+      if err := scanner.Err(); err != nil {
+        panic( err )
+      }
+      gz.Close()
+      sfile.Close()
+    }
 
     dbfile, err := os.Open( dbFPath )
     if err != nil {
@@ -272,7 +314,7 @@ func makeSnapshot( lang string ) {
   }
 }
 
-func supplementHash( lang string, hash map[int64]int ) {
+func supplementHash( lang string, hash map[int64]int, negativeFlag bool ) {
   snapshotsDir := path.Join( DBDir, "snapshots" )
   snapshotFPath := path.Join( snapshotsDir, lang + ".json.gz" )
   _, err := os.Stat( snapshotFPath )
@@ -296,12 +338,13 @@ func supplementHash( lang string, hash map[int64]int ) {
 }
 
 func processLanguage( dbFPath string, articlesFPath string, lang string, geoFPath string ) {
-  wasPageIds := countRecords( dbFPath )
+  wasPageIds := make(map[int64]int)
+  countRecords( dbFPath, wasPageIds )
   cloneHash := make(map[int64]int)
   for key, val := range wasPageIds {
     cloneHash[key] = val
   }
-  supplementHash( lang, wasPageIds ) // w wasPageIds ustawia -1 dla artykulow ze snapshota
+  supplementHash( lang, wasPageIds, true ) // w wasPageIds ustawia -1 dla artykulow ze snapshota
   geoSet := make(map[int64]bool)
   if GeoFlag {
     geoSet = loadGeoSet( geoFPath )
