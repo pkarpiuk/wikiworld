@@ -325,6 +325,17 @@ func Atoi64( s string ) int64 {
   return i
 }
 
+func FileExist( fpath string ) bool {
+  _, err = os.Stat( fpath )
+  if os.IsNotExist( err ) {
+    return false
+  }
+  if err != nil {
+    panic( err )
+  }
+  return true
+}
+
 func mkDir( dir_path string ) {
   if _, err := os.Stat(dir_path); os.IsNotExist(err) {
     err = os.MkdirAll( dir_path, 0777 )

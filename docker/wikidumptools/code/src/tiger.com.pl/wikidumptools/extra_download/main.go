@@ -217,7 +217,8 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
   return newRecordsCounter
 }
 
-func makeSnapshot( lang string ) {
+func makeSnapshot( lang string ) (result bool) {
+  result = false
   dbFPath := path.Join( DBDir, lang + ".json" )
   wasPageIds := make(map[int64]int)
   supplementHash( lang, wasPageIds, false )
@@ -232,11 +233,7 @@ func makeSnapshot( lang string ) {
     os.Chmod( tmpFile.Name(), 0776)
     w := gzip.NewWriter(tmpFile)
 
-    _, err = os.Stat( snapshotFPath )
-    if !os.IsNotExist( err ) {
-      if err != nil {
-        panic(err)
-      }
+    if utils.FileExist( snapshotFPath ) {
       sfile, err := os.Open( snapshotFPath )
       if err != nil {
         panic( err )
@@ -310,30 +307,27 @@ func makeSnapshot( lang string ) {
     if err != nil {
       panic( err )
     }
+    result = true
   }
+  return
 }
 
 func supplementHash( lang string, hash map[int64]int, negativeFlag bool ) {
   snapshotsDir := path.Join( DBDir, "snapshots" )
   snapshotFPath := path.Join( snapshotsDir, lang + ".json.gz" )
-  _, err := os.Stat( snapshotFPath )
-  if os.IsNotExist( err ) {
-    return
+  if utils.FileExist( snapshotFPath ) {
+    file, err := os.Open( snapshotFPath )
+    if err != nil {
+      panic( err )
+    }
+    defer file.Close()
+    gz, err := gzip.NewReader(file)
+    if err != nil {
+      panic( err )
+    }
+    defer gz.Close()
+    innerCountRecords( gz, hash, negativeFlag )
   }
-  if err != nil {
-    panic(err)
-  }
-  file, err := os.Open( snapshotFPath )
-  if err != nil {
-    panic( err )
-  }
-  defer file.Close()
-  gz, err := gzip.NewReader(file)
-  if err != nil {
-    panic( err )
-  }
-  defer gz.Close()
-  innerCountRecords( gz, hash, negativeFlag )
 }
 
 func processLanguage( dbFPath string, articlesFPath string, lang string, geoFPath string ) {
@@ -363,8 +357,9 @@ func processLanguage( dbFPath string, articlesFPath string, lang string, geoFPat
     wasPageIds = cloneHash
     processLanguageInner( dbFPath, articlesFPath, lang, wasPageIds, geoSet )
   }
-  makeSnapshot( lang )
-  os.Remove( dbFPath )
+  if makeSnapshot( lang ) {
+    os.Remove( dbFPath )
+  }
   WaitGroup.Done()
 }
 
