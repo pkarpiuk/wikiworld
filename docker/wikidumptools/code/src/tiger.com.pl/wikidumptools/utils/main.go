@@ -326,7 +326,7 @@ func Atoi64( s string ) int64 {
 }
 
 func FileExist( fpath string ) bool {
-  _, err = os.Stat( fpath )
+  _, err := os.Stat( fpath )
   if os.IsNotExist( err ) {
     return false
   }
