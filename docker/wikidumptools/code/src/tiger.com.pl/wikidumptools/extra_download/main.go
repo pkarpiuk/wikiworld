@@ -58,7 +58,6 @@ func innerCountRecords( r io.Reader, result map[int64]int, negativeFlag bool ) {
 }
 
 func countRecords( dbFPath string, result map[int64]int ) {
-  result = make(map[int64]int)
   file, err := os.Open( dbFPath )
   if os.IsNotExist( err ) {
     return
@@ -334,7 +333,7 @@ func supplementHash( lang string, hash map[int64]int, negativeFlag bool ) {
     panic( err )
   }
   defer gz.Close()
-  innerCountRecords( gz, hash, true )
+  innerCountRecords( gz, hash, negativeFlag )
 }
 
 func processLanguage( dbFPath string, articlesFPath string, lang string, geoFPath string ) {
