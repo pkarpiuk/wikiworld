@@ -149,6 +149,7 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       cgiTitle := url.QueryEscape( strings.Replace( pageTitle, " ", "_", -1 ) )
 
       js := downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&format=json&formatversion=2&utf8=&pageids=%d", lang, pid ) )
+      if js == nil { return }
       if js != nil && js["query"] != nil {
         query := js["query"].(map[string]interface{})
         if query != nil && query["pages"] != nil {
@@ -169,6 +170,7 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       }
 
       js = downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/api/rest_v1/page/summary/%s", lang, cgiTitle ) )
+      if js == nil { return }
       if js != nil {
         delete( js, "content_urls" )
         delete( js, "api_urls" )
@@ -176,6 +178,7 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       }
 
       js = downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/api/rest_v1/page/media/%s", lang, cgiTitle ) )
+      if js == nil { return }
       if js != nil && js["items"] != nil {
         items := js["items"].([]interface{})
         if items != nil {
@@ -190,6 +193,7 @@ func processLanguageInner( dbFPath string, articlesFPath string, lang string, wa
       }
 
       js = downloadJSON( fmt.Sprintf( "https://%s.wikipedia.org/api/rest_v1/page/related/%s", lang, cgiTitle ) )
+      if js == nil { return }
       if js != nil && js["pages"] != nil {
         pages := js["pages"].([]interface{})
         if pages != nil {
