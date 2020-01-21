@@ -95,7 +95,9 @@ func innerDownload( url string ) (result map[string]interface{}) {
 
   str,err := ioutil.ReadAll(resp.Body)
   if err != nil {
-    panic(err)
+    fmt.Fprintf( os.Stderr, "ERROR[6.1]: %v; %s\n  %s\n", err, url, str )
+    time.Sleep(900 * time.Second)
+    return nil
   }
   err = json.Unmarshal( []byte(str), &result )
 
@@ -114,7 +116,7 @@ func downloadJSON( url string ) (result map[string]interface{}) {
   for {
     counter += 1
     result = innerDownload( url )
-    if result != nil || counter > 3 {
+    if result != nil || counter > 5 {
       break
     }
   }
