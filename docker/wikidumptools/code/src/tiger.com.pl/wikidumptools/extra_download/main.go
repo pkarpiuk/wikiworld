@@ -30,7 +30,7 @@ var TheRest int64 = 0
 var DumpsDir string
 var DBDir string
 var WaitGroup sync.WaitGroup
-var GeoFlag bool = true // TODO: potem ustawić na false
+var GeoFlag bool = false
 var ThrottlingDelayMs int = 1000
 
 func innerCountRecords( r io.Reader, result map[int64]int, negativeFlag bool ) {
