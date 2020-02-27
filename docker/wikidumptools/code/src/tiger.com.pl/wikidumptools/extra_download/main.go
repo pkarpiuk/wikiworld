@@ -394,14 +394,26 @@ func Main( args []string ) bool {
     }
   }
 
+  correctLangs := make(map[string]bool)
+  files_list, err = ioutil.ReadDir( DBDir )
+  if err != nil {
+    panic( err )
+  }
+  for _, fi := range files_list {
+    if !fi.IsDir() && strings.HasSuffix( fi.Name(), ".json" ) {
+      lang := fi.Name()[0:2]
+      correctLangs[lang] = true
+    }
+  }
+
   DumpsDir = path.Join( utils.DataDir, "cache", "dumps", "wikipedia" )
   files_list, err = ioutil.ReadDir( DumpsDir )
   if err != nil {
     panic( err )
   }
   for _, fi := range files_list {
-    if fi.IsDir() {
-      lang := fi.Name()
+    lang := fi.Name()
+    if fi.IsDir() && correctLangs[lang] { // TODO: usunac drugi warunek
       dumpDir := path.Join( DumpsDir, lang, "current" )
       fi, err := os.Stat( dumpDir )
       if err == nil && fi.Mode().IsDir() {
