@@ -151,8 +151,8 @@ func generateTop( timestamp time.Time ) {
   _, LangPublicDataDir := utils.ParsePublicLangWiki( fmt.Sprintf( "%swiki", LangCode ), true )
   outputDir := path.Join( LangPublicDataDir )
   os.MkdirAll( outputDir, 0777 )
-  outputFPath := path.Join( outputDir, "hour_pageview.json" )
 
+  outputFPath := path.Join( outputDir, "hour_pageview.json" )
   out, err := ioutil.TempFile( outputDir, "tmp" )
   if err != nil {
     panic( err )
@@ -163,6 +163,32 @@ func generateTop( timestamp time.Time ) {
   enc.Encode( result )
   out.Close()
   err = os.Rename( out.Name(), outputFPath )
+  if err != nil {
+    panic( err )
+  }
+  err = os.Chmod(outputFPath, 0755)
+  if err != nil {
+    panic( err )
+  }
+
+  result.Categories = nil
+  for _, article := range result.Articles {
+    article.Cats = nil
+    article.PageLinks = nil
+    article.Prev = nil
+    article.Next = nil
+  }
+  outputFPath = path.Join( outputDir, "hour_pageview_simple.json" )
+  out2, err := ioutil.TempFile( outputDir, "tmp" )
+  if err != nil {
+    panic( err )
+  }
+  defer os.Remove( out2.Name() )
+  os.Chmod( out2.Name(), 0755)
+  enc = json.NewEncoder( out2 )
+  enc.Encode( result )
+  out2.Close()
+  err = os.Rename( out2.Name(), outputFPath )
   if err != nil {
     panic( err )
   }
