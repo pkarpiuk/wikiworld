@@ -167,7 +167,50 @@ docker run --restart=unless-stopped -v ${DATA_DIR}:/db -e EVENTS_DAYS=64 wikidum
         <a name="downloader-stats.txt"></a><h3>6.1. downloader-stats.txt</h3>
         <p>Plik <code>public/downloader-stats.txt</code> zawiera podsumowanie zawartości drzewa katalogów z danymi (zakorzenionego w <i>DATA_DIR</i>). Generowany jest na zakończenie każdego cyklu procesu 'wikidumptools daily'.</p>
         <p>Przykładowa zawartość:</p>
-        <pre>TODO</pre>
+        <pre>== BEGIN at 2022-03-06 22:08:38 +0100 data-dir-info ==
+          /cache/dumps/wikipedia/pl:
+            20220301	OK	current,latest,latest-valid
+          /cache/dumps/wikipedia/en:
+            20220301	OK	current,latest,latest-valid
+          
+          $ du -h /db
+          1,1G	/db/cache/dumps/wikipedia/pl/20220301
+          1,1G	/db/cache/dumps/wikipedia/pl
+          8,2G	/db/cache/dumps/wikipedia/en/20220301
+          8,2G	/db/cache/dumps/wikipedia/en
+          18G	/db/cache/dumps/wikipedia
+          4,0K	/db/cache/dumps/wikiquote
+          18G	/db/cache/dumps
+          21G	/db/cache/pageview/days
+          899M	/db/cache/pageview/hours
+          14G	/db/cache/pageview/months
+          35G	/db/cache/pageview
+          587M	/db/cache/clickstream/2018-07
+          ...
+          820M	/db/cache/clickstream/2021-11
+          37G	/db/cache/clickstream
+          90G	/db/cache
+          3,1M	/db/public/wikipedia/pl/20220301
+          3,1M	/db/public/wikipedia/pl
+          17M	/db/public/wikipedia/en/20220301
+          17M	/db/public/wikipedia/en
+          37M	/db/public/wikipedia
+          4,0K	/db/public/wikiquote
+          37M	/db/public
+          4,0K	/db/db/wikipedia/articles/snapshots
+          8,0K	/db/db/wikipedia/articles
+          12K	/db/db/wikipedia
+          4,0K	/db/db/wikiquote/articles/snapshots
+          8,0K	/db/db/wikiquote/articles
+          12K	/db/db/wikiquote
+          4,0K	/db/db/events/raw
+          4,0K	/db/db/events/stats
+          12K	/db/db/events
+          40K	/db/db
+          680K	/db/logs
+          90G	/db
+          == END at 2022-03-06 22:08:38 +0100 [00:00:00] ==
+          </pre>
         <a name="hour-pageview.json"></a><h3>6.2. hour-pageview.json</h3>
         <p>Pliki <code><i>DATA_DIR</i>/public/wikipedia/<i>lang</i>/<i>version</i>/hour-pageview.json</code> są generowane średnio co godzinę dla każdej wersji językowej Wikipedii wymienionej w zmiennej środowiskowej <code>WIKIPEDIA_LANGUAGES</code> oraz <code><a href="#Ukryte%20zmienne">SupportedWikiLangs</a></code>. Każdy taki plik zawiera informacje o ok. 1000 najpopularniejszych artykułach w ostatnich max. 24 godzinach.</p>
         <p>W poniższym opisie nazwa pola ujęta w nawiasy kwadratowe oznacza że pole jest opcjonalne.</p>

@@ -218,19 +218,24 @@ def span_s( start_ts )
   return Time.at(Time.now - start_ts).gmtime.strftime("%H:%M:%S")
 end
 
+# https://dumps.wikimedia.org/other/pageview_complete/monthly/2022/2022-02/pageviews-202202-user.bz2
 # Dokumentacja: https://dumps.wikimedia.org/other/pagecounts-ez/
 def download_pageview_months( months_count )
-  main_url = 'https://dumps.wikimedia.org/other/pagecounts-ez/merged/'
+  main_url = 'https://dumps.wikimedia.org/other/pageview_complete/monthly/'
+  # main_url = 'https://dumps.wikimedia.org/other/pagecounts-ez/merged/'
   mpageview_dir = File.join( $data_dir, 'cache', 'pageview', 'months')
   FileUtils.mkdir_p( mpageview_dir )
-  # Wyciągamy listę plików dostępnych w Internecie: po jednym dla każdego miesiąca
-  doc = Nokogiri::HTML( `curl -sL '#{main_url}'` )
+
+  date = Date.today << 1
+  counter = 0
   arr = Array.new
-  doc.css( 'a' ).each do |a|
-    a.text.match( /pagecounts-(\d{4}-\d{2})-views-ge-5-totals\.bz2/ ) do |m| 
-      arr.push({'date'=>m[1], 'filename' => a['href'], 'url' => join( main_url, a['href'] )})
-    end
-  end  
+  while (date.to_s >= '2012-01-01') && ((months_count == 0) || (counter < months_count)) do
+    year, month = date.strftime('%Y'), date.strftime('%m')
+    fname = "pageviews-#{year}#{month}-user.bz2"
+    arr.push({'date' => "#{year}-#{month}", 'filename' => fname, 'url' => join(main_url, fname)})
+    date << 1
+    counter += 1
+  end
   arr = arr.sort{|r1,r2| r1['date'] <=> r2['date'] }.reverse
   if months_count > 0 then arr = arr[0...months_count] end
   # Usuwamy stare tymczasowe pliki
@@ -243,7 +248,7 @@ def download_pageview_months( months_count )
   # Ściągamy pliki
   arr.each do |rec|
     output_fpath = File.join( mpageview_dir, rec['filename'] )
-    if !File.exist?( output_fpath ) then # ... jeśli jeszcze nie ma
+    if !File.size?( output_fpath ) then # ... jeśli jeszcze nie ma
       start_ts = Time.now
       print "Downloading #{rec['url']}... "
       `wget -q '#{rec['url']}' -O '#{tmp_fpath}'`
@@ -260,6 +265,8 @@ def download_pageview_months( months_count )
   remove_old_pageview_files( months_count, 'months' )
 end
 
+# https://dumps.wikimedia.org/other/pageview_complete/2022/2022-03/pageviews-20220305-user.bz2
+# Dokumentacja: https://dumps.wikimedia.org/other/pageview_complete/readme.html
 def download_pageview_days( days_count )
   dpageview_dir = File.join( $data_dir, 'cache', 'pageview', 'days')
   FileUtils.mkdir_p( dpageview_dir )
@@ -273,15 +280,18 @@ def download_pageview_days( days_count )
   counter = 0
   tmpfname = "tmp-#{SecureRandom.hex(6)}.tmp"
   tmp_fpath = File.join( dpageview_dir, tmpfname )
-  while (date.to_s >= '2011-11-16') && ((days_count <= 0) || (counter < days_count)) do
+  while (date.to_s >= '2011-12-01') && ((days_count <= 0) || (counter < days_count)) do
     year, month, day = date.strftime('%Y'), date.strftime('%m'), date.strftime('%d')
-    fname = "pagecounts-#{year}-#{month}-#{day}.bz2"
+    fname = "pageviews-#{year}#{month}#{day}-user.bz2"
+    # fname = "pagecounts-#{year}-#{month}-#{day}.bz2"
     output_fpath = File.join( dpageview_dir, fname )
-    if File.exist?( output_fpath ) then
+    if File.size?( output_fpath ) then
       counter += 1
     else
       start_ts = Time.now
-      url = "https://dumps.wikimedia.org/other/pagecounts-ez/merged/#{year}/#{year}-#{month}/#{fname}"
+      # 2020-09-24
+      url = "https://dumps.wikimedia.org/other/pageview_complete/#{year}/#{year}-#{month}/#{fname}"
+      # url = "https://dumps.wikimedia.org/other/pagecounts-ez/merged/#{year}/#{year}-#{month}/#{fname}"
       print "Downloading #{url}... "
       `wget -q '#{url}' -O '#{tmp_fpath}'`
       status = $?.exitstatus
@@ -373,11 +383,11 @@ def usage
   STDERR.puts "Options examples:"
   STDERR.puts "   pageview-months [count]"
   STDERR.puts "     Ściąga <count> (domyślnie 26, 0 oznacza wszystkie) najnowsze pliki"
-  STDERR.puts "     https://dumps.wikimedia.org/other/pagecounts-ez/merged/pagecounts-YYYY-MM-views-ge-5-totals.bz2"
+  STDERR.puts "     https://dumps.wikimedia.org/other/pageview_complete/monthly/YYYY/YYYY-MM/pageviews-YYYYMM-user.bz2"
   STDERR.puts "     do $DATA_DIR/cache/pageview/months/ i usuwa starsze"
   STDERR.puts "   pageview-days [count]"
   STDERR.puts "     Ściąga <count> (domyślnie 64, 0 oznacza wszystkie) najnowsze pliki"
-  STDERR.puts "     https://dumps.wikimedia.org/other/pagecounts-ez/merged/YYYY/YYYY-MM/pagecounts-YYYY-MM-DD.bz2"
+  STDERR.puts "     https://dumps.wikimedia.org/other/pageview_complete/YYYY/YYYY-MM/pageviews-YYYYMMDD-user.bz2"
   STDERR.puts "     do $DATA_DIR/cache/pageview/days/ i usuwa starsze"
   STDERR.puts "   pageview-hours count"
   STDERR.puts "     Ściąga <count> (domyślnie 26) najnowsze pliki"
