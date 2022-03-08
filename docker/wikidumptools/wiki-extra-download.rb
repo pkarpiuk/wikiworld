@@ -232,8 +232,8 @@ def download_pageview_months( months_count )
   while (date.to_s >= '2012-01-01') && ((months_count == 0) || (counter < months_count)) do
     year, month = date.strftime('%Y'), date.strftime('%m')
     fname = "pageviews-#{year}#{month}-user.bz2"
-    arr.push({'date' => "#{year}-#{month}", 'filename' => fname, 'url' => join(main_url, fname)})
-    date << 1
+    arr.push({'date' => "#{year}-#{month}", 'filename' => fname, 'url' => "#{main_url}#{year}/#{year}-#{month}/#{fname}"})
+    date <<= 1
     counter += 1
   end
   arr = arr.sort{|r1,r2| r1['date'] <=> r2['date'] }.reverse
@@ -372,7 +372,7 @@ def remove_old_pageview_files( count, dir_name, ext="bz2" )
   if count <= 0 then return end
   pageview_subdir = File.join( $data_dir, 'cache', 'pageview', dir_name)
   if File.directory?( pageview_subdir ) then
-    Dir[File.join(pageview_subdir, "*.#{ext}")].sort.reverse[count..-1].each do |fpath|
+    (Dir[File.join(pageview_subdir, "*.#{ext}")].sort.reverse[count..-1] || []).each do |fpath|
       puts "Removing old pageview file: '#{fpath}'"
       File.unlink( fpath )
     end
