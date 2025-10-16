@@ -44,7 +44,7 @@ def docker_run( docker_cmd, raise_at_fail=false )
   puts docker_cmd
 
   docker_cmd.gsub!(/^.*\swiki-extra-download\s/, "./wiki-extra-download.rb ")
-  docker_cmd.gsub!(/^.*\swikidumptools\s/, "./main ")
+  docker_cmd.gsub!(/^.*\swikidumptools\s/, "./run ")
   puts docker_cmd
 
   result = `#{docker_cmd}`

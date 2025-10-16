@@ -32,11 +32,11 @@ case $1 in
     ;;
   "rest")
     shift
-    exec ./main extra-download "$@"
+    exec ./run extra-download "$@"
     ;;
   "events")
     shift
-    exec ./main events "$@"
+    exec ./run events "$@"
     ;;
   "switch")
     shift
