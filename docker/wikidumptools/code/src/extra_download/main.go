@@ -16,7 +16,7 @@ import (
 	"sync"
 	"time"
 
-	utils "tiger.com.pl/wikidumptools/utils"
+	utils "wikidumptools/utils"
 )
 
 type Record struct {

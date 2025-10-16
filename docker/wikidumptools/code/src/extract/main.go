@@ -15,7 +15,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	utils "tiger.com.pl/wikidumptools/utils"
+	utils "wikidumptools/utils"
 )
 
 var AllArticlesById map[string]string = make(map[string]string)

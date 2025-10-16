@@ -15,13 +15,13 @@ import (
 	"strings"
 	"time"
 
-	utils "tiger.com.pl/wikidumptools/utils"
+	utils "wikidumptools/utils"
 
-	cathier "tiger.com.pl/wikidumptools/cathier"
+	cathier "wikidumptools/cathier"
 
-	createts "tiger.com.pl/wikidumptools/createts"
+	createts "wikidumptools/createts"
 
-	clickstream "tiger.com.pl/wikidumptools/clickstream"
+	clickstream "wikidumptools/clickstream"
 )
 
 type WikiArticle struct {

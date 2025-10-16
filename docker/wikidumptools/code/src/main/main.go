@@ -8,29 +8,29 @@ import (
 	"regexp"
 	"strings"
 
-	utils "tiger.com.pl/wikidumptools/utils"
+	utils "wikidumptools/utils"
 
-	extract "tiger.com.pl/wikidumptools/extract"
+	extract "wikidumptools/extract"
 
-	cathier "tiger.com.pl/wikidumptools/cathier"
+	cathier "wikidumptools/cathier"
 
-	synthesis "tiger.com.pl/wikidumptools/synthesis"
+	synthesis "wikidumptools/synthesis"
 
-	pageview "tiger.com.pl/wikidumptools/pageview"
+	pageview "wikidumptools/pageview"
 
-	pageview_hour "tiger.com.pl/wikidumptools/pageview_hour"
+	pageview_hour "wikidumptools/pageview_hour"
 
-	geomap "tiger.com.pl/wikidumptools/geomap"
+	geomap "wikidumptools/geomap"
 
-	clickstream "tiger.com.pl/wikidumptools/clickstream"
+	clickstream "wikidumptools/clickstream"
 
-	monitor "tiger.com.pl/wikidumptools/monitor"
+	monitor "wikidumptools/monitor"
 
-	createts "tiger.com.pl/wikidumptools/createts"
+	createts "wikidumptools/createts"
 
-	extra_download "tiger.com.pl/wikidumptools/extra_download"
+	extra_download "wikidumptools/extra_download"
 
-	events "tiger.com.pl/wikidumptools/events"
+	events "wikidumptools/events"
 )
 
 func usage() {

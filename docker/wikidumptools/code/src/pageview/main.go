@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	utils "tiger.com.pl/wikidumptools/utils"
+	utils "wikidumptools/utils"
 )
 
 func dumpDoc() {
