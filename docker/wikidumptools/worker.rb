@@ -70,7 +70,7 @@ end
 
 def wikidumptools_run( dump_path, phase_name, docker_cmd )
   log_path = get_log_path( dump_path, phase_name )
-  if File.exists?( log_path ) then
+  if File.exist?( log_path ) then
     if (`tail -1 '#{log_path}'` =~ /^OK$/) then
       puts "Operation '#{phase_name}' in #{dump_path} looks completed, skip"
       return 0
