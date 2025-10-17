@@ -514,12 +514,12 @@ func process_templatelinks_table(p map[string]string) {
 // https://www.mediawiki.org/wiki/Manual:Categorylinks_table
 func process_categorylinks_table(p map[string]string) {
 	cl_from := p["cl_from"]
-	cl_to := p["cl_to"]
+	cl_to := p["cl_target_id"]
 	cl_type := p["cl_type"]
 	if (cl_from != "") && (cl_to != "") {
 		if cl_type == "page" {
 			if _, ok := AllArticlesById[cl_from]; ok {
-				if cid, ok2 := AllCategoriesByTitle[cl_to]; ok2 {
+				if cid, ok2 := AllCategoriesById[cl_to]; ok2 {
 					p["cl_to"] = cid
 					TheOutput.WriteRecord("article2category", p)
 				} else {
@@ -534,7 +534,7 @@ func process_categorylinks_table(p map[string]string) {
 			}
 		} else if cl_type == "subcat" {
 			if _, ok3 := AllCategoriesById[cl_from]; ok3 {
-				if cid2, ok4 := AllCategoriesByTitle[cl_to]; ok4 {
+				if cid2, ok4 := AllCategoriesById[cl_to]; ok4 {
 					p["cl_to"] = cid2
 					TheOutput.WriteRecord("category2category", p)
 				} else {
