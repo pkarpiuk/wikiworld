@@ -650,14 +650,16 @@ func processNetFiles() {
 		processNetFile("redirect.sql.gz", process_redirect_table)
 	}
 	if check("abstract") {
-		url := fmt.Sprintf("https://dumps.wikimedia.org/%s/%s/%s-%s-%s", LangWiki, utils.DumpDateStr, LangWiki, utils.DumpDateStr, "abstract.xml.gz")
-		stream := utils.HTTPStream(url)
-		gz, err := gzip.NewReader(stream)
-		if err != nil {
-			panic(err)
-		}
-		defer gz.Close()
-		ProcessAbstractXML(url, gz)
+		/*
+			 		url := fmt.Sprintf("https://dumps.wikimedia.org/%s/%s/%s-%s-%s", LangWiki, utils.DumpDateStr, LangWiki, utils.DumpDateStr, "abstract.xml.gz")
+					stream := utils.HTTPStream(url)
+					gz, err := gzip.NewReader(stream)
+					if err != nil {
+						panic(err)
+					}
+					defer gz.Close()
+					ProcessAbstractXML(url, gz)
+		*/
 	}
 	if check("geo_tags") {
 		processNetFile("geo_tags.sql.gz", process_geo_tags_table)
