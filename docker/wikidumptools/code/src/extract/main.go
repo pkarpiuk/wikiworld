@@ -519,8 +519,8 @@ func process_categorylinks_table(p map[string]string) {
 	if (cl_from != "") && (cl_to != "") {
 		if cl_type == "page" {
 			if _, ok := AllArticlesById[cl_from]; ok {
-				if cid, ok2 := AllCategoriesById[cl_to]; ok2 {
-					p["cl_to"] = cid
+				if _, ok2 := AllCategoriesById[cl_to]; ok2 {
+					p["cl_to"] = cl_to
 					TheOutput.WriteRecord("article2category", p)
 				} else {
 					IncMissing("categorylinks-page-to")
@@ -534,8 +534,8 @@ func process_categorylinks_table(p map[string]string) {
 			}
 		} else if cl_type == "subcat" {
 			if _, ok3 := AllCategoriesById[cl_from]; ok3 {
-				if cid2, ok4 := AllCategoriesById[cl_to]; ok4 {
-					p["cl_to"] = cid2
+				if _, ok4 := AllCategoriesById[cl_to]; ok4 {
+					p["cl_to"] = cl_to
 					TheOutput.WriteRecord("category2category", p)
 				} else {
 					IncMissing("categorylinks-category-to")
