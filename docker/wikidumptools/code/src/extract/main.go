@@ -24,6 +24,7 @@ var AllRedirectionsById map[string]*Redirect = make(map[string]*Redirect)
 var AllRedirectionsByTitle map[string]*Redirect = make(map[string]*Redirect)
 var AllCategoriesById map[string]string = make(map[string]string)
 var AllCategoriesByTitle map[string]string = make(map[string]string)
+var LinkTargetById map[string]string = make(map[string]string)
 
 var MissingCounter = make(map[string]int)
 
@@ -511,16 +512,24 @@ func process_templatelinks_table(p map[string]string) {
 	}
 }
 
+// https://www.mediawiki.org/wiki/Manual:Linktarget_table
+func process_linktarget_table(p map[string]string) {
+	lt_id := p["lt_id"]
+	lt_title := p["lt_title"]
+	LinkTargetById[lt_id] = lt_title
+}
+
 // https://www.mediawiki.org/wiki/Manual:Categorylinks_table
 func process_categorylinks_table(p map[string]string) {
 	cl_from := p["cl_from"]
-	cl_to := p["cl_target_id"]
+	cl_target_id := p["cl_target_id"]
+	cl_to := LinkTargetById[cl_target_id]
 	cl_type := p["cl_type"]
 	if (cl_from != "") && (cl_to != "") {
 		if cl_type == "page" {
 			if _, ok := AllArticlesById[cl_from]; ok {
-				if _, ok2 := AllCategoriesById[cl_to]; ok2 {
-					p["cl_to"] = cl_to
+				if pid, ok2 := AllCategoriesByTitle[cl_to]; ok2 {
+					p["cl_to"] = pid
 					TheOutput.WriteRecord("article2category", p)
 				} else {
 					IncMissing("categorylinks-page-to")
@@ -534,8 +543,8 @@ func process_categorylinks_table(p map[string]string) {
 			}
 		} else if cl_type == "subcat" {
 			if _, ok3 := AllCategoriesById[cl_from]; ok3 {
-				if _, ok4 := AllCategoriesById[cl_to]; ok4 {
-					p["cl_to"] = cl_to
+				if cid, ok4 := AllCategoriesByTitle[cl_to]; ok4 {
+					p["cl_to"] = cid
 					TheOutput.WriteRecord("category2category", p)
 				} else {
 					IncMissing("categorylinks-category-to")
@@ -609,8 +618,8 @@ func ProcessAbstractXML(streamName string, r io.ReadCloser) {
 func processLocalFiles(inputDir string) {
 	utils.ProcessLocalFile(path.Join(inputDir, "page.tsv"), process_page_table, "\t", nil)
 	utils.ProcessLocalFile(path.Join(inputDir, "redirect.tsv"), process_redirect_table, "\t", nil)
-	fpath := path.Join(inputDir, "abstract.xml")
-	ProcessAbstractXML(fpath, utils.FileStream(fpath))
+	// fpath := path.Join(inputDir, "abstract.xml")
+	// ProcessAbstractXML(fpath, utils.FileStream(fpath))
 	utils.ProcessLocalFile(path.Join(inputDir, "geo_tags.tsv"), process_geo_tags_table, "\t", nil)
 	utils.ProcessLocalFile(path.Join(inputDir, "categorylinks.tsv"), process_categorylinks_table, "\t", nil)
 	utils.ProcessLocalFile(path.Join(inputDir, "page_restrictions.tsv"), process_page_restrictions_table, "\t", nil)
@@ -665,6 +674,7 @@ func processNetFiles() {
 		processNetFile("geo_tags.sql.gz", process_geo_tags_table)
 	}
 	if check("categorylinks") {
+		processNetFile("linktarget.sql.gz", process_linktarget_table)
 		processNetFile("categorylinks.sql.gz", process_categorylinks_table)
 	}
 	if check("page_restrictions") {
