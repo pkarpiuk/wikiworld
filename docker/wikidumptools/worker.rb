@@ -172,7 +172,7 @@ def daily_main()
     result, status = docker_run( "docker run --rm -v '#{$DATA_DIR}':/db wiki-extra-download clickstream #{$CLICKSTREAM_MONTHS} >> '#{clickstream_log_fpath}' 2>&1" )
   end
 
-  puts "Downloading new dumps"
+  puts "Downloading new dumps..."
   # Zaciągamy najnowsze dumpy (extract+cathier full)
   json = get_last_dump_dates( $WIKIPEDIA_LANGUAGES.map{|lc| lc+'wiki'}.concat($WIKIQUOTE_LANGUAGES.map{|lc| lc+'wikiquote'}).to_set )
   $WIKIPEDIA_LANGUAGES.each do |lc|

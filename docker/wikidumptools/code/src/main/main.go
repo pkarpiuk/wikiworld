@@ -98,7 +98,6 @@ var Writer io.WriteCloser
 // RecordCounter ...
 var RecordCounter int = 0
 
-// Buffer ...
 var Buffer []string = make([]string, 0)
 
 func sql2tsv(p map[string]string) {
