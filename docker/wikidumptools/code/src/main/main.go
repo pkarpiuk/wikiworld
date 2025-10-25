@@ -92,10 +92,8 @@ func usage() {
 	os.Exit(1)
 }
 
-// Writer ...
 var Writer io.WriteCloser
 
-// RecordCounter ...
 var RecordCounter int = 0
 
 var Buffer []string = make([]string, 0)
